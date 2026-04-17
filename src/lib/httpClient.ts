@@ -9,10 +9,9 @@ export interface ApiResponse<T = any> {
 
 const baseURL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
 
-// ২. এক্সিওস ইনস্ট্যান্স তৈরি
 const axiosInstance: AxiosInstance = axios.create({
   baseURL,
-  withCredentials: true, // এটি বাধ্যতামূলক! যাতে Better Auth এর কুকি সার্ভারে যায়।
+  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },

@@ -1,7 +1,9 @@
-import React from "react";
+import RegisterForm from "@/components/feture/auth/register-form";
 
-function RegisterPage() {
-  return <div>page</div>;
+export default function RegisterPage() {
+  return (
+    <div>
+      <RegisterForm />
+    </div>
+  );
 }
-
-export default RegisterPage;
