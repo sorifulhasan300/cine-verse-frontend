@@ -7,7 +7,7 @@ export interface ApiResponse<T = any> {
   message?: string;
 }
 
-const baseURL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
+const baseURL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
 const axiosInstance: AxiosInstance = axios.create({
   baseURL,
@@ -22,7 +22,7 @@ axiosInstance.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       if (typeof window !== "undefined") {
-        // window.location.href = '/login';
+        window.location.href = "/login";
       }
     }
     return Promise.reject(error);

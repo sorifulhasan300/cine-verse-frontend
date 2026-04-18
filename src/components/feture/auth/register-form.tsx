@@ -17,12 +17,15 @@ import { Eye, EyeOff, Film } from "lucide-react";
 import { POSTER_COLORS, POSTER_TITLES } from "@/components/style/style";
 import Link from "next/link";
 import { registerSchema } from "@/zod/auth.validation";
+import { authService } from "@/services/auth.service";
+import { useRouter } from "next/navigation";
 
 type RegisterValues = z.infer<typeof registerSchema>;
 
 export default function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const router = useRouter();
 
   const form = useForm<RegisterValues>({
     resolver: zodResolver(registerSchema),
@@ -31,13 +34,16 @@ export default function RegisterForm() {
 
   async function onSubmit(values: RegisterValues) {
     try {
-      console.log("Form Values:", values);
-      toast.success("Welcome to the Verse!");
-    } catch {
-      toast.error("Something went wrong.");
+      const { confirmPassword, ...signUpData } = values;
+      const response = await authService.signUp(signUpData);
+      console.log(response);
+      toast.success("Welcome to CineVerse!");
+      router.push("/login");
+    } catch (error) {
+      console.error("Registration error:", error);
+      toast.error("Sign up failed.");
     }
   }
-
   return (
     <div className="flex min-h-screen bg-[#080810] text-slate-200 overflow-hidden font-sans">
       {/* --- LEFT PANEL (Desktop Only) --- */}
@@ -132,6 +138,7 @@ export default function RegisterForm() {
                       <input
                         className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 text-sm focus:outline-none focus:border-red-600/50 transition-all"
                         placeholder="John Doe"
+                        autoComplete="off"
                         {...field}
                       />
                     </FormControl>
@@ -152,6 +159,7 @@ export default function RegisterForm() {
                       <input
                         className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 text-sm focus:outline-none focus:border-red-600/50 transition-all"
                         placeholder="you@example.com"
+                        autoComplete="email"
                         {...field}
                       />
                     </FormControl>
@@ -173,6 +181,7 @@ export default function RegisterForm() {
                         type={showPassword ? "text" : "password"}
                         className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 text-sm focus:outline-none focus:border-red-600/50 transition-all"
                         placeholder="••••••••"
+                        autoComplete="new-password"
                         {...field}
                       />
                       <button
@@ -205,6 +214,7 @@ export default function RegisterForm() {
                         type={showConfirm ? "text" : "password"}
                         className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 text-sm focus:outline-none focus:border-red-600/50 transition-all"
                         placeholder="••••••••"
+                        autoComplete="new-password"
                         {...field}
                       />
                       <button

@@ -1,4 +1,4 @@
-import LoginForm from "@/components/feture/auth/login-form";
+import { LoginForm } from "@/components/feture/auth/login-form";
 
 export default function LoginPage() {
   return (
