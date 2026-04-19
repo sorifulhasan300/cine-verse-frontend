@@ -1,253 +1,225 @@
 "use client";
 
 import React, { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@/components/ui/form";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
-import { Eye, EyeOff, Film } from "lucide-react";
-import { POSTER_COLORS, POSTER_TITLES } from "@/components/style/style";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import Link from "next/link";
-import { registerSchema } from "@/zod/auth.validation";
-import { authService } from "@/services/auth.service";
+import { useForm } from "@tanstack/react-form";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { authClient } from "@/lib/auth-client";
+import { Eye, EyeOff } from "lucide-react";
+import z from "zod";
 
-type RegisterValues = z.infer<typeof registerSchema>;
+const formSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+  confirmPassword: z.string(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
+});
 
-export default function RegisterForm() {
+export function RegisterForm({
+  className,
+  ...props
+}: React.ComponentProps<"div">) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const router = useRouter();
 
-  const form = useForm<RegisterValues>({
-    resolver: zodResolver(registerSchema),
-    defaultValues: { name: "", email: "", password: "", confirmPassword: "" },
+  const form = useForm({
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    },
+    validators: {
+      onSubmit: formSchema,
+    },
+    onSubmit: async ({ value }) => {
+      const toastId = toast.loading("Creating account...");
+      try {
+        const { confirmPassword, ...signUpData } = value;
+        const { data, error } = await authClient.signUp.email(signUpData);
+        if (error) {
+          toast.error(error.message, { id: toastId });
+          return;
+        }
+        toast.success("Account created successfully", { id: toastId });
+        router.push("/login");
+      } catch (error) {
+        toast.error("Something went wrong", { id: toastId });
+      }
+    },
   });
-
-  async function onSubmit(values: RegisterValues) {
-    try {
-      const { confirmPassword, ...signUpData } = values;
-      const response = await authService.signUp(signUpData);
-      console.log(response);
-      toast.success("Welcome to CineVerse!");
-      router.push("/login");
-    } catch (error) {
-      console.error("Registration error:", error);
-      toast.error("Sign up failed.");
-    }
-  }
   return (
-    <div className="flex min-h-screen bg-[#080810] text-slate-200 overflow-hidden font-sans">
-      {/* --- LEFT PANEL (Desktop Only) --- */}
-      <div className="hidden lg:block relative w-1/2 overflow-hidden border-r border-white/5">
-        {/* Poster Grid */}
-        <div className="absolute inset-0 grid grid-cols-3 grid-rows-4 gap-1 transform -rotate-6 scale-125 -translate-y-4">
-          {POSTER_COLORS.map(([from, to], i) => (
-            <div
-              key={i}
-              className={`relative rounded bg-gradient-to-br ${from} ${to} flex flex-col items-center justify-end pb-4 border border-white/5 overflow-hidden`}
-            >
-              <div className="w-7 h-[2px] bg-white/20 rounded mb-2" />
-              <span className="text-[10px] tracking-[3px] text-white/30 font-bold">
-                {POSTER_TITLES[i]}
-              </span>
-              <div className="absolute inset-0 bg-[repeating-linear-gradient(180deg,transparent,transparent_3px,rgba(0,0,0,0.1)_3px,rgba(0,0,0,0.1)_4px)] pointer-events-none" />
-            </div>
-          ))}
-        </div>
-
-        {/* Overlays */}
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#080810]/40 to-[#080810]" />
-
-        {/* Content */}
-        <div className="absolute inset-0 p-12 flex flex-col justify-between z-10">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-br from-red-600 to-red-900 rounded-lg shadow-[0_0_20px_rgba(220,38,38,0.5)]">
-              <Film size={24} className="text-white" />
-            </div>
-            <span className="text-2xl font-bold tracking-[4px] text-white uppercase">
-              CineVerse
-            </span>
-          </div>
-
-          <div className="max-w-md">
-            <h1 className="text-6xl font-black leading-none text-white tracking-tighter mb-4 uppercase">
-              Your Universe <br /> of{" "}
-              <span className="text-red-600">Cinema</span> <br /> Awaits.
-            </h1>
-            <p className="text-slate-400 text-sm mb-8">
-              Thousands of films, originals, and series — all in one place. Join
-              now and never miss a frame.
-            </p>
-            <div className="flex gap-8">
-              {["10K+", "Titles", "4K", "Quality", "2M+", "Members"].map(
-                (text, i) =>
-                  i % 2 === 0 ? (
-                    <div key={i} className="flex flex-col">
-                      <span className="text-xl font-bold text-white">
-                        {text}
-                      </span>
-                      <span className="text-[10px] uppercase tracking-widest text-slate-500">
-                        {
-                          ["10K+", "Titles", "4K", "Quality", "2M+", "Members"][
-                            i + 1
-                          ]
-                        }
-                      </span>
-                    </div>
-                  ) : null,
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* --- RIGHT PANEL (Form) --- */}
-      <div className="flex-1 flex items-center justify-center p-6 relative">
-        <div className="absolute w-[500px] h-[500px] bg-red-600/5 rounded-full blur-[100px] -z-10" />
-
-        <div className="w-full max-w-[400px] bg-white/5 backdrop-blur-3xl border border-white/10 p-8 rounded-3xl shadow-2xl">
-          <div className="mb-8">
-            <h2 className="text-3xl font-bold tracking-tight text-white uppercase">
-              Join the Verse
-            </h2>
-            <p className="text-slate-400 text-xs mt-1">
-              Create your free account and start streaming today.
-            </p>
-          </div>
-
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <label className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
-                      Full Name
-                    </label>
-                    <FormControl>
-                      <input
-                        className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 text-sm focus:outline-none focus:border-red-600/50 transition-all"
+    <div className={cn("flex flex-col gap-6", className)} {...props}>
+      <Card>
+        <CardHeader>
+          <CardTitle>Join the Verse</CardTitle>
+          <CardDescription>
+            Enter your details below to create your account
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form
+            id="register-form"
+            onSubmit={(e) => {
+              e.preventDefault();
+              form.handleSubmit();
+            }}
+          >
+            <FieldGroup>
+              <form.Field name="name">
+                {(field) => {
+                  const isInvalid =
+                    field.state.meta.isTouched && !field.state.meta.isValid;
+                  return (
+                    <Field data-invalid={isInvalid}>
+                      <FieldLabel htmlFor={field.name}>Full Name</FieldLabel>
+                      <Input
+                        id={field.name}
+                        name={field.name}
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(e) => field.handleChange(e.target.value)}
                         placeholder="John Doe"
-                        autoComplete="off"
-                        {...field}
+                        autoComplete="name"
                       />
-                    </FormControl>
-                    <FormMessage className="text-[10px] text-red-500" />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <label className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
-                      Email
-                    </label>
-                    <FormControl>
-                      <input
-                        className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 text-sm focus:outline-none focus:border-red-600/50 transition-all"
-                        placeholder="you@example.com"
+                      {isInvalid && (
+                        <FieldError errors={field.state.meta.errors} />
+                      )}
+                    </Field>
+                  );
+                }}
+              </form.Field>
+              <form.Field name="email">
+                {(field) => {
+                  const isInvalid =
+                    field.state.meta.isTouched && !field.state.meta.isValid;
+                  return (
+                    <Field data-invalid={isInvalid}>
+                      <FieldLabel htmlFor={field.name}>Email</FieldLabel>
+                      <Input
+                        id={field.name}
+                        name={field.name}
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        placeholder="Email"
                         autoComplete="email"
-                        {...field}
                       />
-                    </FormControl>
-                    <FormMessage className="text-[10px] text-red-500" />
-                  </FormItem>
-                )}
-              />
+                      {isInvalid && (
+                        <FieldError errors={field.state.meta.errors} />
+                      )}
+                    </Field>
+                  );
+                }}
+              </form.Field>
+              <form.Field name="password">
+                {(field) => {
+                  const isInvalid =
+                    field.state.meta.isTouched && !field.state.meta.isValid;
+                  return (
+                    <Field data-invalid={isInvalid}>
+                      <FieldLabel htmlFor={field.name}>Password</FieldLabel>
+                      <div className="relative">
+                        <Input
+                          id={field.name}
+                          type={showPassword ? "text" : "password"}
+                          name={field.name}
+                          value={field.state.value}
+                          onBlur={field.handleBlur}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                          placeholder="Password"
+                          autoComplete="new-password"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700 transition-colors"
+                        >
+                          {showPassword ? (
+                            <EyeOff size={16} />
+                          ) : (
+                            <Eye size={16} />
+                          )}
+                        </button>
+                      </div>
+                      {isInvalid && (
+                        <FieldError errors={field.state.meta.errors} />
+                      )}
+                    </Field>
+                  );
+                }}
+              </form.Field>
+              <form.Field name="confirmPassword">
+                {(field) => {
+                  const isInvalid =
+                    field.state.meta.isTouched && !field.state.meta.isValid;
+                  return (
+                    <Field data-invalid={isInvalid}>
+                      <FieldLabel htmlFor={field.name}>Confirm Password</FieldLabel>
+                      <div className="relative">
+                        <Input
+                          id={field.name}
+                          type={showConfirm ? "text" : "password"}
+                          name={field.name}
+                          value={field.state.value}
+                          onBlur={field.handleBlur}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                          placeholder="Confirm Password"
+                          autoComplete="new-password"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowConfirm(!showConfirm)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700 transition-colors"
+                        >
+                          {showConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
+                        </button>
+                      </div>
+                      {isInvalid && (
+                        <FieldError errors={field.state.meta.errors} />
+                      )}
+                    </Field>
+                  );
+                }}
+              </form.Field>
+            </FieldGroup>
+          </form>
+        </CardContent>
+        <CardFooter>
+          <Field>
+            <Button form="register-form" type="submit">
+              Get Started
+            </Button>
 
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <label className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
-                      Password
-                    </label>
-                    <div className="relative">
-                      <input
-                        type={showPassword ? "text" : "password"}
-                        className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 text-sm focus:outline-none focus:border-red-600/50 transition-all"
-                        placeholder="••••••••"
-                        autoComplete="new-password"
-                        {...field}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors"
-                      >
-                        {showPassword ? (
-                          <EyeOff size={16} />
-                        ) : (
-                          <Eye size={16} />
-                        )}
-                      </button>
-                    </div>
-                    <FormMessage className="text-[10px] text-red-500" />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="confirmPassword"
-                render={({ field }) => (
-                  <FormItem>
-                    <label className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
-                      Confirm Password
-                    </label>
-                    <div className="relative">
-                      <input
-                        type={showConfirm ? "text" : "password"}
-                        className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 text-sm focus:outline-none focus:border-red-600/50 transition-all"
-                        placeholder="••••••••"
-                        autoComplete="new-password"
-                        {...field}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowConfirm(!showConfirm)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors"
-                      >
-                        {showConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
-                      </button>
-                    </div>
-                    <FormMessage className="text-[10px] text-red-500" />
-                  </FormItem>
-                )}
-              />
-
-              <Button
-                type="submit"
-                disabled={form.formState.isSubmitting}
-                className="w-full h-12 bg-gradient-to-r from-red-600 to-red-800 hover:from-red-500 hover:to-red-700 text-white font-bold tracking-widest rounded-xl transition-all shadow-[0_10px_20px_rgba(220,38,38,0.2)]"
-              >
-                {form.formState.isSubmitting ? "SYNCING..." : "GET STARTED"}
-              </Button>
-            </form>
-          </Form>
-
-          <p className="text-center text-xs text-slate-500 mt-6">
-            Already a member?{" "}
-            <Link href="/login" className="text-red-500 hover:underline">
-              Sign in
-            </Link>
-          </p>
-        </div>
-      </div>
+            <FieldDescription className="text-center">
+              Already a member? <Link href="/login">Sign in</Link>
+            </FieldDescription>
+          </Field>
+        </CardFooter>
+      </Card>
     </div>
   );
 }
