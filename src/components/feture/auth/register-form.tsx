@@ -24,7 +24,7 @@ import { useForm } from "@tanstack/react-form";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Film, User, Mail } from "lucide-react";
 import z from "zod";
 
 const formSchema = z.object({
@@ -72,12 +72,18 @@ export function RegisterForm({
     },
   });
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card>
-        <CardHeader>
-          <CardTitle>Join the Verse</CardTitle>
-          <CardDescription>
-            Enter your details below to create your account
+    <div
+      className={cn("w-full max-w-md mx-auto", className)}
+      {...props}
+    >
+      <Card className="max-w-4xl w-full border border-red-500 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-2xl">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl font-bold text-white flex items-center justify-center gap-2">
+            <Film className="w-6 h-6 text-red-500" />
+            Join CineVerse
+          </CardTitle>
+          <CardDescription className="text-slate-300">
+            Create your account to unlock the cinematic experience
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -88,23 +94,27 @@ export function RegisterForm({
               form.handleSubmit();
             }}
           >
-            <FieldGroup>
+            <FieldGroup className="space-y-4">
               <form.Field name="name">
                 {(field) => {
                   const isInvalid =
                     field.state.meta.isTouched && !field.state.meta.isValid;
                   return (
                     <Field data-invalid={isInvalid}>
-                      <FieldLabel htmlFor={field.name}>Full Name</FieldLabel>
-                      <Input
-                        id={field.name}
-                        name={field.name}
-                        value={field.state.value}
-                        onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        placeholder="John Doe"
-                        autoComplete="name"
-                      />
+                      <FieldLabel htmlFor={field.name} className="text-white">Full Name</FieldLabel>
+                      <div className="relative">
+                        <Input
+                          id={field.name}
+                          name={field.name}
+                          value={field.state.value}
+                          onBlur={field.handleBlur}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                          placeholder="John Doe"
+                          autoComplete="name"
+                          className="pl-10 bg-slate-800 border-slate-600 text-white placeholder-slate-400"
+                        />
+                        <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
+                      </div>
                       {isInvalid && (
                         <FieldError errors={field.state.meta.errors} />
                       )}
@@ -118,16 +128,20 @@ export function RegisterForm({
                     field.state.meta.isTouched && !field.state.meta.isValid;
                   return (
                     <Field data-invalid={isInvalid}>
-                      <FieldLabel htmlFor={field.name}>Email</FieldLabel>
-                      <Input
-                        id={field.name}
-                        name={field.name}
-                        value={field.state.value}
-                        onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        placeholder="Email"
-                        autoComplete="email"
-                      />
+                      <FieldLabel htmlFor={field.name} className="text-white">Email</FieldLabel>
+                      <div className="relative">
+                        <Input
+                          id={field.name}
+                          name={field.name}
+                          value={field.state.value}
+                          onBlur={field.handleBlur}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                          placeholder="Email"
+                          autoComplete="email"
+                          className="pl-10 bg-slate-800 border-slate-600 text-white placeholder-slate-400"
+                        />
+                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
+                      </div>
                       {isInvalid && (
                         <FieldError errors={field.state.meta.errors} />
                       )}
@@ -141,7 +155,7 @@ export function RegisterForm({
                     field.state.meta.isTouched && !field.state.meta.isValid;
                   return (
                     <Field data-invalid={isInvalid}>
-                      <FieldLabel htmlFor={field.name}>Password</FieldLabel>
+                      <FieldLabel htmlFor={field.name} className="text-white">Password</FieldLabel>
                       <div className="relative">
                         <Input
                           id={field.name}
@@ -152,11 +166,12 @@ export function RegisterForm({
                           onChange={(e) => field.handleChange(e.target.value)}
                           placeholder="Password"
                           autoComplete="new-password"
+                          className="pl-10 pr-10 bg-slate-800 border-slate-600 text-white placeholder-slate-400"
                         />
                         <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700 transition-colors"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 transition-colors"
                         >
                           {showPassword ? (
                             <EyeOff size={16} />
@@ -178,7 +193,7 @@ export function RegisterForm({
                     field.state.meta.isTouched && !field.state.meta.isValid;
                   return (
                     <Field data-invalid={isInvalid}>
-                      <FieldLabel htmlFor={field.name}>Confirm Password</FieldLabel>
+                      <FieldLabel htmlFor={field.name} className="text-white">Confirm Password</FieldLabel>
                       <div className="relative">
                         <Input
                           id={field.name}
@@ -189,11 +204,12 @@ export function RegisterForm({
                           onChange={(e) => field.handleChange(e.target.value)}
                           placeholder="Confirm Password"
                           autoComplete="new-password"
+                          className="pl-10 pr-10 bg-slate-800 border-slate-600 text-white placeholder-slate-400"
                         />
                         <button
                           type="button"
                           onClick={() => setShowConfirm(!showConfirm)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700 transition-colors"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 transition-colors"
                         >
                           {showConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
                         </button>
@@ -208,16 +224,24 @@ export function RegisterForm({
             </FieldGroup>
           </form>
         </CardContent>
-        <CardFooter>
-          <Field>
-            <Button form="register-form" type="submit">
-              Get Started
-            </Button>
-
-            <FieldDescription className="text-center">
-              Already a member? <Link href="/login">Sign in</Link>
-            </FieldDescription>
-          </Field>
+        <CardFooter className="flex flex-col space-y-4">
+          <Button
+            form="register-form"
+            type="submit"
+            className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
+          >
+            <Film className="w-4 h-4 mr-2" />
+            Get Started
+          </Button>
+          <FieldDescription className="text-center text-slate-300">
+            Already a member?{" "}
+            <Link
+              href="/login"
+              className="text-red-400 hover:text-red-300 underline"
+            >
+              Sign in
+            </Link>
+          </FieldDescription>
         </CardFooter>
       </Card>
     </div>

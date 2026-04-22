@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
-import { Mail, Lock, Film } from "lucide-react";
+import { Film, Mail } from "lucide-react";
 
 import { useForm } from "@tanstack/react-form";
 import { useRouter } from "next/navigation";
@@ -59,7 +59,7 @@ export function LoginForm({
   });
   return (
     <div
-      className={cn("flex items-center justify-center min-h-screen", className)}
+      className={cn("w-full max-w-md mx-auto", className)}
       {...props}
     >
       <Card className="max-w-4xl w-full border border-red-500 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-2xl">

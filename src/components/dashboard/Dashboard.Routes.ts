@@ -20,55 +20,66 @@ export interface DashboardRoute {
 export const dashboardRoutes: DashboardRoute[] = [
   // Common routes (accessible by both)
   {
-    path: "/dashboard",
+    path: "/user",
     label: "Dashboard",
     icon: Home,
-    roles: [UserRole.USER, UserRole.ADMIN],
+    roles: [UserRole.USER],
   },
-  {
-    path: "/dashboard/profile",
-    label: "Profile",
-    icon: User,
-    roles: [UserRole.USER, UserRole.ADMIN],
-  },
-
   // User-only routes
   {
-    path: "/dashboard/my-movies",
+    path: "/user/my-movies",
     label: "My Movies",
     icon: Film,
     roles: [UserRole.USER],
   },
   {
-    path: "/dashboard/watchlist",
+    path: "/user/watchlist",
     label: "Watchlist",
     icon: List,
+    roles: [UserRole.USER],
+  },
+  {
+    path: "/user/profile",
+    label: "Profile",
+    icon: User,
     roles: [UserRole.USER],
   },
 
   // Admin-only routes
   {
-    path: "/dashboard/user-management",
+    path: "/admin/user-management",
     label: "User Management",
     icon: Users,
     roles: [UserRole.ADMIN],
   },
   {
-    path: "/dashboard/movie-management",
+    path: "/admin/movie-management",
     label: "Movie Management",
     icon: Film,
     roles: [UserRole.ADMIN],
   },
   {
-    path: "/dashboard/analytics",
+    path: "/admin/analytics",
     label: "Analytics",
     icon: BarChart3,
     roles: [UserRole.ADMIN],
   },
   {
-    path: "/dashboard/settings",
+    path: "/admin/settings",
     label: "Settings",
     icon: Settings,
+    roles: [UserRole.ADMIN],
+  },
+  {
+    path: "/admin/profile",
+    label: "Profile",
+    icon: User,
+    roles: [UserRole.ADMIN],
+  },
+  {
+    path: "/admin",
+    label: "Dashboard",
+    icon: Home,
     roles: [UserRole.ADMIN],
   },
 ];
