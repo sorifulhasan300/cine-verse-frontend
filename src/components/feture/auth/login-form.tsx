@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
+import { Mail, Lock, Film } from "lucide-react";
 
 import { useForm } from "@tanstack/react-form";
 import { useRouter } from "next/navigation";
@@ -44,25 +45,31 @@ export function LoginForm({
     onSubmit: async ({ value }) => {
       const toastId = toast.loading("login...");
       try {
-        const { data, error } = await authClient.signIn.email(value);
+        const { error } = await authClient.signIn.email(value);
         if (error) {
           toast.error(error.message, { id: toastId });
           return;
         }
         toast.success("Login Successfully", { id: toastId });
         router.push("/");
-      } catch (error) {
+      } catch {
         toast.error("Something was wrong", { id: toastId });
       }
     },
   });
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card>
-        <CardHeader>
-          <CardTitle>Login to your account</CardTitle>
-          <CardDescription>
-            Enter your email below to login to your account
+    <div
+      className={cn("flex items-center justify-center min-h-screen", className)}
+      {...props}
+    >
+      <Card className="max-w-4xl w-full border border-red-500 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-2xl">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl font-bold text-white flex items-center justify-center gap-2">
+            <Film className="w-6 h-6 text-red-500" />
+            Welcome to CineVerse
+          </CardTitle>
+          <CardDescription className="text-slate-300">
+            Enter your credentials to unlock the cinematic experience
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -73,23 +80,28 @@ export function LoginForm({
               form.handleSubmit();
             }}
           >
-            <FieldGroup>
+            <FieldGroup className="space-y-4">
               <form.Field name="email">
                 {(field) => {
                   const isInvalid =
                     field.state.meta.isTouched && !field.state.meta.isValid;
                   return (
-                     <Field data-invalid={isInvalid}>
-                       <FieldLabel htmlFor={field.name}>Email</FieldLabel>
-                       <Input
-                         id={field.name}
-                         name={field.name}
-                         value={field.state.value}
-                         onBlur={field.handleBlur}
-                         onChange={(e) => field.handleChange(e.target.value)}
-                         placeholder="Email"
-                         autoComplete="email"
-                       />
+                    <Field data-invalid={isInvalid}>
+                      <FieldLabel htmlFor={field.name} className="text-white">
+                        Email
+                      </FieldLabel>
+                      <div className="relative">
+                        <Input
+                          id={field.name}
+                          name={field.name}
+                          value={field.state.value}
+                          onBlur={field.handleBlur}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                          placeholder="Email"
+                          autoComplete="email"
+                          className="pl-10 bg-slate-800 border-slate-600 text-white placeholder-slate-400"
+                        />
+                      </div>
                       {isInvalid && (
                         <FieldError errors={field.state.meta.errors} />
                       )}
@@ -103,19 +115,23 @@ export function LoginForm({
                     field.state.meta.isTouched && !field.state.meta.isValid;
 
                   return (
-                     <Field data-invalid={isInvalid}>
-                       <FieldLabel htmlFor={field.name}>Password</FieldLabel>
-
-                       <Input
-                         id={field.name}
-                         type="password"
-                         name={field.name}
-                         value={field.state.value}
-                         onBlur={field.handleBlur}
-                         onChange={(e) => field.handleChange(e.target.value)}
-                         placeholder="Password"
-                         autoComplete="current-password"
-                       />
+                    <Field data-invalid={isInvalid}>
+                      <FieldLabel htmlFor={field.name} className="text-white">
+                        Password
+                      </FieldLabel>
+                      <div className="relative">
+                        <Input
+                          id={field.name}
+                          type="password"
+                          name={field.name}
+                          value={field.state.value}
+                          onBlur={field.handleBlur}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                          placeholder="Password"
+                          autoComplete="current-password"
+                          className="pl-10 bg-slate-800 border-slate-600 text-white placeholder-slate-400"
+                        />
+                      </div>
                       {isInvalid && (
                         <FieldError errors={field.state.meta.errors} />
                       )}
@@ -126,16 +142,24 @@ export function LoginForm({
             </FieldGroup>
           </form>
         </CardContent>
-        <CardFooter>
-          <Field>
-            <Button form="login-form" type="submit">
-              Login
-            </Button>
-
-            <FieldDescription className="text-center">
-              Don&apos;t have an account? <Link href="/signup">Sign up</Link>
-            </FieldDescription>
-          </Field>
+        <CardFooter className="flex flex-col space-y-4">
+          <Button
+            form="login-form"
+            type="submit"
+            className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
+          >
+            <Film className="w-4 h-4 mr-2" />
+            Login
+          </Button>
+          <FieldDescription className="text-center text-slate-300">
+            Don&apos;t have an account?{" "}
+            <Link
+              href="/signup"
+              className="text-red-400 hover:text-red-300 underline"
+            >
+              Sign up
+            </Link>
+          </FieldDescription>
         </CardFooter>
       </Card>
     </div>
