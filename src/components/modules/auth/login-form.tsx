@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
-import { Film, Mail } from "lucide-react";
+import { Film, Lock, Mail, User } from "lucide-react";
 
 import { useForm } from "@tanstack/react-form";
 import { useRouter } from "next/navigation";
@@ -58,10 +58,7 @@ export function LoginForm({
     },
   });
   return (
-    <div
-      className={cn("w-full max-w-md mx-auto", className)}
-      {...props}
-    >
+    <div className={cn("w-full max-w-md mx-auto", className)} {...props}>
       <Card className="max-w-4xl w-full border border-red-500 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-2xl">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold text-white flex items-center justify-center gap-2">
@@ -91,6 +88,8 @@ export function LoginForm({
                         Email
                       </FieldLabel>
                       <div className="relative">
+                        <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
+
                         <Input
                           id={field.name}
                           name={field.name}
@@ -120,6 +119,8 @@ export function LoginForm({
                         Password
                       </FieldLabel>
                       <div className="relative">
+                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
+
                         <Input
                           id={field.name}
                           type="password"
@@ -154,7 +155,7 @@ export function LoginForm({
           <FieldDescription className="text-center text-slate-300">
             Don&apos;t have an account?{" "}
             <Link
-              href="/signup"
+              href="/register"
               className="text-red-400 hover:text-red-300 underline"
             >
               Sign up
