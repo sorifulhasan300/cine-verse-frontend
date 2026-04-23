@@ -1,7 +1,8 @@
 import React from "react";
+import { UsersAdmin } from "@/components/modules/dashboard/admin/UsersAdmin";
 
 function UsersPage() {
-  return <div>UsersPage</div>;
+  return <UsersAdmin />;
 }
 
 export default UsersPage;

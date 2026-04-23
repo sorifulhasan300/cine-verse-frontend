@@ -47,14 +47,14 @@ export const dashboardRoutes: DashboardRoute[] = [
 
   // Admin-only routes
   {
-    path: "/admin/user-management",
-    label: "User Management",
+    path: "/admin/users",
+    label: "Users",
     icon: Users,
     roles: [UserRole.ADMIN],
   },
   {
-    path: "/admin/movie-management",
-    label: "Movie Management",
+    path: "/admin/movies",
+    label: "Movies",
     icon: Film,
     roles: [UserRole.ADMIN],
   },

@@ -7,7 +7,8 @@ export interface ApiResponse<T = any> {
   message?: string;
 }
 
-const baseURL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+const baseURL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
 
 const axiosInstance: AxiosInstance = axios.create({
   baseURL,
