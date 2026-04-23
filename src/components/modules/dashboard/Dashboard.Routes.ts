@@ -26,12 +26,7 @@ export const dashboardRoutes: DashboardRoute[] = [
     roles: [UserRole.USER],
   },
   // User-only routes
-  {
-    path: "/user/my-movies",
-    label: "My Movies",
-    icon: Film,
-    roles: [UserRole.USER],
-  },
+
   {
     path: "/user/watchlist",
     label: "Watchlist",

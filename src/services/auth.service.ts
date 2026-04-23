@@ -1,5 +1,6 @@
-import { api, ApiResponse } from "@/lib/httpClient";
+import { api } from "@/lib/httpClient";
 import { SignInData, SignUpData } from "@/types/auth.types";
+import { authClient } from "@/lib/auth-client";
 
 export async function signUp(data: SignUpData) {
   try {
@@ -21,7 +22,20 @@ export async function signIn(data: SignInData) {
   }
 }
 
+export async function updateUserProfile(data: {
+  image?: string;
+  name?: string;
+}) {
+  try {
+    const response = await authClient.updateUser(data);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
 export const authService = {
   signUp,
   signIn,
+  updateUserProfile,
 };

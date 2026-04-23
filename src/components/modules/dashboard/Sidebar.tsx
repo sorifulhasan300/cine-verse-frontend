@@ -15,7 +15,6 @@ import { UserRole } from "@/types/role.types";
 export function Sidebar() {
   const pathname = usePathname();
   const { data: session, isPending } = authClient.useSession();
-
   const user = session?.user;
 
   // লোডিং স্টেট (Skeleton Vibe)
