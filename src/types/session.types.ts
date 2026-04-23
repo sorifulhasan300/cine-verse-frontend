@@ -1,13 +1,7 @@
-export type session = {
-  user: {
-    id: string;
-    name: string;
-    email: string;
-    role: string;
-    image?: string;
-  };
-  session: {
-    id: string;
-    expiresAt: string;
+import type { BetterAuthSession } from "better-auth";
+
+export type session = BetterAuthSession & {
+  user: BetterAuthSession["user"] & {
+    role?: string;
   };
 };

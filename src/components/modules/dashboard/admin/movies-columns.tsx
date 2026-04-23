@@ -68,7 +68,7 @@ export const moviesColumns: ColumnDef<Movie>[] = [
       const movie = row.original
       return (
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+          <DropdownMenuTrigger>
             <Button variant="ghost" className="h-8 w-8 p-0 text-red-400 hover:bg-red-500/10">
               <span className="sr-only">Open menu</span>
               <MoreHorizontal className="h-4 w-4" />

@@ -39,7 +39,7 @@ interface ProfileCardProps {
     id: string;
     name: string;
     email: string;
-    role: string;
+    role?: string;
     image?: string;
   };
   variant?: "user" | "admin";
@@ -133,7 +133,7 @@ function ProfileCard({ user, variant = "user" }: ProfileCardProps) {
                 </h2>
                 <p className="text-slate-300">{user.email}</p>
                 <span className="inline-block bg-red-500/20 text-red-300 text-sm px-3 py-1 rounded-full border border-red-500/30">
-                  {user.role}
+                  {user.role || (variant === "admin" ? "ADMIN" : "USER")}
                 </span>
               </div>
             </div>

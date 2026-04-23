@@ -1,18 +1,20 @@
 import { DataTable } from "@/components/ui/data-table"
 import { usersColumns } from "./users-columns"
+import { User, UserStatus } from "@/types/user.types"
+import { UserRole } from "@/types/role.types"
 
 // Mock data for demonstration - replace with actual server action
-const mockUsers = [
+const mockUsers: User[] = [
   {
     id: "1",
     name: "John Doe",
     email: "john@example.com",
-    role: "USER",
+    role: UserRole.USER,
     image: null,
     createdAt: "2023-01-01T00:00:00Z",
     updatedAt: "2023-01-01T00:00:00Z",
     phone: "+1234567890",
-    status: "ACTIVE",
+    status: UserStatus.ACTIVE,
   },
   // Add more mock data as needed
 ]

@@ -1,8 +1,9 @@
 import { DataTable } from "@/components/ui/data-table"
 import { moviesColumns } from "./movies-columns"
+import { Movie, MovieStatus } from "@/types/movie.types"
 
 // Mock data for demonstration - replace with actual server action
-const mockMovies = [
+const mockMovies: Movie[] = [
   {
     id: "1",
     title: "Inception",
@@ -14,7 +15,7 @@ const mockMovies = [
     posterUrl: "/posters/inception.jpg",
     duration: 148,
     rating: 8.8,
-    status: "AVAILABLE",
+    status: MovieStatus.AVAILABLE,
     createdAt: "2023-01-01T00:00:00Z",
     updatedAt: "2023-01-01T00:00:00Z",
   },
