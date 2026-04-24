@@ -6,8 +6,6 @@ export async function proxy(request: NextRequest) {
 
   const session = await getSessionFromRequest(request); // ← request পাঠাও
 
-  console.log("user session", session);
-
   // Login/Register এ আছে + session আছে → dashboard এ পাঠাও
   if (
     session &&

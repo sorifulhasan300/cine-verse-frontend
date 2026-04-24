@@ -42,14 +42,22 @@ export const dashboardRoutes: DashboardRoute[] = [
 
   // Admin-only routes
   {
-    path: "/admin/users",
-    label: "Users",
-    icon: Users,
+    path: "/admin",
+    label: "Dashboard",
+    icon: Home,
     roles: [UserRole.ADMIN],
   },
+
   {
     path: "/admin/movies",
-    label: "Movies",
+    label: "Manage Movies",
+    icon: Film,
+    roles: [UserRole.ADMIN],
+  },
+
+  {
+    path: "/admin/movie/category",
+    label: "Create Movie Category",
     icon: Film,
     roles: [UserRole.ADMIN],
   },
@@ -66,15 +74,15 @@ export const dashboardRoutes: DashboardRoute[] = [
     roles: [UserRole.ADMIN],
   },
   {
-    path: "/admin/profile",
-    label: "Profile",
-    icon: User,
+    path: "/admin/users",
+    label: "Manage Users",
+    icon: Users,
     roles: [UserRole.ADMIN],
   },
   {
-    path: "/admin",
-    label: "Dashboard",
-    icon: Home,
+    path: "/admin/profile",
+    label: "Profile",
+    icon: User,
     roles: [UserRole.ADMIN],
   },
 ];
