@@ -4,7 +4,7 @@ import { DataTable } from "@/components/ui/data-table";
 import { getUsersColumns } from "./users-columns";
 import { useQuery } from "@tanstack/react-query";
 import { userManagementService } from "@/services/user-management.service";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useDebounce } from "use-debounce";
 import { Input } from "@/components/ui/input";
@@ -30,7 +30,8 @@ export function UsersAdmin() {
     }
     params.set("page", "1"); // Reset to first page on search
     router.replace(`?${params.toString()}`);
-  }, [debouncedSearchInput, router, searchParams]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearchInput, router]);
 
   const {
     data: usersData,
@@ -63,6 +64,19 @@ export function UsersAdmin() {
   const handleUserAction = () => {
     refetch();
   };
+
+  const handlePageChange = useCallback((newPage: number) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("page", newPage.toString());
+    router.replace(`?${params.toString()}`);
+  }, [searchParams, router]);
+
+  const handleLimitChange = useCallback((newLimit: number) => {
+    setLimit(newLimit);
+    const params = new URLSearchParams(searchParams);
+    params.set("page", "1");
+    router.replace(`?${params.toString()}`);
+  }, [searchParams, router]);
 
   if (isLoading) {
     return (
@@ -117,17 +131,8 @@ export function UsersAdmin() {
         columns={getUsersColumns({ onUserAction: handleUserAction })}
         data={users}
         pagination={pagination}
-        onPageChange={(newPage) => {
-          const params = new URLSearchParams(searchParams);
-          params.set("page", newPage.toString());
-          router.replace(`?${params.toString()}`);
-        }}
-        onLimitChange={(newLimit) => {
-          setLimit(newLimit);
-          const params = new URLSearchParams(searchParams);
-          params.set("page", "1");
-          router.replace(`?${params.toString()}`);
-        }}
+        onPageChange={handlePageChange}
+        onLimitChange={handleLimitChange}
       />
     </div>
   );

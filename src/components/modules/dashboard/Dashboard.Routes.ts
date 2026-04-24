@@ -25,8 +25,6 @@ export const dashboardRoutes: DashboardRoute[] = [
     icon: Home,
     roles: [UserRole.USER],
   },
-  // User-only routes
-
   {
     path: "/user/watchlist",
     label: "Watchlist",
@@ -56,18 +54,12 @@ export const dashboardRoutes: DashboardRoute[] = [
   },
 
   {
-    path: "/admin/movie/category",
-    label: "Create Movie Category",
+    path: "/admin/category",
+    label: "Manage Movie Category",
     icon: Film,
     roles: [UserRole.ADMIN],
   },
 
-  {
-    path: "/admin/settings",
-    label: "Settings",
-    icon: Settings,
-    roles: [UserRole.ADMIN],
-  },
   {
     path: "/admin/users",
     label: "Manage Users",
