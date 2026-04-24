@@ -12,7 +12,12 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { UserRole } from "@/types/role.types";
 
-export function Sidebar() {
+interface SidebarProps {
+  onClose?: () => void;
+  isInDrawer?: boolean;
+}
+
+export function Sidebar({ onClose, isInDrawer = false }: SidebarProps) {
   const pathname = usePathname();
   const { data: session, isPending } = authClient.useSession();
   const user = session?.user;
@@ -43,7 +48,10 @@ export function Sidebar() {
   );
 
   return (
-    <aside className="w-72 bg-[#050509]/95 backdrop-blur-xl border-r border-white/5 flex flex-col h-screen sticky top-0">
+    <aside className={cn(
+      "w-72 bg-[#050509]/95 backdrop-blur-xl border-r border-white/5 flex flex-col",
+      isInDrawer ? "h-full" : "h-screen sticky top-0"
+    )}>
       {/* --- LOGO SECTION --- */}
       <div className="p-8">
         <Link href="/" className="flex items-center gap-3 group">
@@ -67,7 +75,7 @@ export function Sidebar() {
           const isActive = pathname === route.path;
 
           return (
-            <Link key={route.path} href={route.path}>
+            <Link key={route.path} href={route.path} onClick={onClose}>
               <div
                 className={cn(
                   "group relative flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-300 mb-1",
@@ -132,6 +140,7 @@ export function Sidebar() {
                     ? "/admin/settings"
                     : "/user/settings"
                 }
+                onClick={onClose}
               >
                 <Settings className="w-4 h-4 mr-2" />
                 Settings
