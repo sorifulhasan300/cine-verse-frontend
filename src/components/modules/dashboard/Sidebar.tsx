@@ -22,7 +22,6 @@ export function Sidebar({ onClose, isInDrawer = false }: SidebarProps) {
   const { data: session, isPending } = authClient.useSession();
   const user = session?.user;
 
-  // লোডিং স্টেট (Skeleton Vibe)
   if (isPending) {
     return (
       <div className="w-72 bg-[#050509] border-r border-white/5 flex flex-col h-screen">
@@ -48,10 +47,12 @@ export function Sidebar({ onClose, isInDrawer = false }: SidebarProps) {
   );
 
   return (
-    <aside className={cn(
-      "w-72 bg-[#050509]/95 backdrop-blur-xl border-r border-white/5 flex flex-col",
-      isInDrawer ? "h-full" : "h-screen sticky top-0"
-    )}>
+    <aside
+      className={cn(
+        "w-72 bg-[#050509]/95 backdrop-blur-xl border-r border-white/5 flex flex-col",
+        isInDrawer ? "h-full" : "h-screen sticky top-0",
+      )}
+    >
       {/* --- LOGO SECTION --- */}
       <div className="p-8">
         <Link href="/" className="flex items-center gap-3 group">

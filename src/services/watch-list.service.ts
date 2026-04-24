@@ -1,8 +1,5 @@
 import { serverApi } from "@/lib/serverHttpClient";
-import {
-  WatchListItem,
-  ServiceResponse,
-} from "@/types/watch-list.types";
+import { WatchListItem, ServiceResponse } from "@/types/watch-list.types";
 
 export const watchListService = {
   async getMyWatchList(): Promise<ServiceResponse<WatchListItem[]>> {
