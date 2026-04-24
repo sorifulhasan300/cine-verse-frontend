@@ -9,6 +9,7 @@ import {
   SortingState,
   useReactTable,
   getPaginationRowModel,
+  OnChangeFn,
 } from "@tanstack/react-table";
 
 import {
@@ -21,16 +22,18 @@ import {
 } from "@/components/ui/table";
 
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
+  columns: ColumnDef<TData, TValue>[]
+  data: TData[]
   pagination?: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
-  onPageChange?: (page: number) => void;
-  onLimitChange?: (limit: number) => void;
+    page: number
+    limit: number
+    total: number
+    totalPages: number
+  }
+  onPageChange?: (page: number) => void
+  onLimitChange?: (limit: number) => void
+  sorting?: SortingState
+  onSortingChange?: OnChangeFn<SortingState>
 }
 
 export function DataTable<TData, TValue>({
@@ -39,18 +42,23 @@ export function DataTable<TData, TValue>({
   pagination,
   onPageChange,
   onLimitChange,
+  sorting,
+  onSortingChange,
 }: DataTableProps<TData, TValue>) {
-  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [internalSorting, setInternalSorting] = React.useState<SortingState>([]);
+
+  const currentSorting = sorting !== undefined ? sorting : internalSorting;
+  const currentOnSortingChange = onSortingChange || setInternalSorting;
 
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    onSortingChange: setSorting,
+    onSortingChange: currentOnSortingChange,
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     state: {
-      sorting,
+      sorting: currentSorting,
     },
     manualPagination: !!pagination,
     pageCount: pagination?.totalPages || 0,
@@ -60,30 +68,32 @@ export function DataTable<TData, TValue>({
     <div className="space-y-4">
       <div className="rounded-md border border-red-500/20 bg-black/20 backdrop-blur-sm">
         <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow
-                key={headerGroup.id}
-                className="border-red-500/20 hover:bg-red-500/10"
-              >
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead
-                      key={header.id}
-                      className="text-red-400 font-semibold"
-                    >
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
+        <TableHeader>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <TableRow key={headerGroup.id} className="border-red-500/20 hover:bg-red-500/10">
+              {headerGroup.headers.map((header) => {
+                return (
+                  <TableHead
+                    key={header.id}
+                    className="text-red-400 font-semibold cursor-pointer select-none"
+                    onClick={header.column.getToggleSortingHandler()}
+                  >
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                    {{
+                      asc: ' 🔼',
+                      desc: ' 🔽',
+                    }[header.column.getIsSorted() as string] ?? null}
+                  </TableHead>
+                )
+              })}
+            </TableRow>
+          ))}
+        </TableHeader>
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (

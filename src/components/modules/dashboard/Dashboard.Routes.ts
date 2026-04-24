@@ -61,12 +61,7 @@ export const dashboardRoutes: DashboardRoute[] = [
     icon: Film,
     roles: [UserRole.ADMIN],
   },
-  {
-    path: "/admin/analytics",
-    label: "Analytics",
-    icon: BarChart3,
-    roles: [UserRole.ADMIN],
-  },
+
   {
     path: "/admin/settings",
     label: "Settings",
