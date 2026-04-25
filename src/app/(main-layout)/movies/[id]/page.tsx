@@ -22,6 +22,9 @@ export default async function MovieDetailsPage({
       if (!result.success) {
         throw new Error(result.error || "Failed to fetch movie details");
       }
+      if (!result.data) {
+        throw new Error("Movie not found");
+      }
       return result.data;
     },
     staleTime: 5 * 60 * 1000,

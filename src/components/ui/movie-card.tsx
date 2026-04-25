@@ -70,13 +70,12 @@ export function MovieCard({ movie }: MovieCardProps) {
           {movie.description}
         </p>
 
-        <Link
-          href={`/movies/${movie.id}`}
-          className="w-full bg-red-600 hover:bg-red-700"
-        >
-          <Film className="w-4 h-4 mr-2" />
-          Watch Now
-        </Link>
+        <Button className="w-full bg-red-600 hover:bg-red-700" asChild>
+          <Link href={`/movies/${movie.id}`}>
+            <Film className="w-4 h-4 mr-2" />
+            Watch Now
+          </Link>
+        </Button>
       </CardContent>
     </Card>
   );
