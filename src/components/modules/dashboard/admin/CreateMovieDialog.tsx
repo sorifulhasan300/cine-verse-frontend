@@ -7,12 +7,14 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  movieManagementService,
-  MovieFormData,
-} from "@/services/movie-management.service";
+
 import { useQuery } from "@tanstack/react-query";
 import { movieValidationSchema } from "@/zod/movie.validation";
+import {
+  adminMovieService,
+  MovieFormData,
+} from "@/services/admin.movie.service";
+import { categoryService } from "@/services/category.service";
 
 interface CreateMovieDialogProps {
   onMovieCreated?: () => void;
@@ -24,12 +26,12 @@ interface CreateMovieDialogProps {
 // Helper function to format date for display
 const formatDateForDisplay = (isoString: string): string => {
   const date = new Date(isoString);
-  const month = (date.getMonth() + 1).toString().padStart(2, '0');
-  const day = date.getDate().toString().padStart(2, '0');
+  const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  const day = date.getDate().toString().padStart(2, "0");
   const year = date.getFullYear();
   let hour = date.getHours();
-  const minute = date.getMinutes().toString().padStart(2, '0');
-  const ampm = hour >= 12 ? 'PM' : 'AM';
+  const minute = date.getMinutes().toString().padStart(2, "0");
+  const ampm = hour >= 12 ? "PM" : "AM";
 
   hour = hour % 12;
   hour = hour ? hour : 12; // 12 for midnight/noon
@@ -52,8 +54,10 @@ export function CreateMovieDialog({
   const { data: categoriesData } = useQuery({
     queryKey: ["categories"],
     queryFn: async () => {
-      const response = await movieManagementService.getCategories();
-      return response.data || [];
+      const response = await categoryService.getCategories();
+      // Handle different API response structures
+      const categories = response.data || response.data || [];
+      return Array.isArray(categories) ? categories : [];
     },
   });
   const categories = categoriesData || [];
@@ -102,9 +106,9 @@ export function CreateMovieDialog({
   const createMutation = useMutation({
     mutationFn: (data: MovieFormData) => {
       if (isEditing && editingMovie?.id) {
-        return movieManagementService.updateMovie(editingMovie.id, data);
+        return adminMovieService.updateMovie(editingMovie.id, data);
       }
-      return movieManagementService.createMovie(data);
+      return adminMovieService.createMovie(data);
     },
     onSuccess: () => {
       toast.success(

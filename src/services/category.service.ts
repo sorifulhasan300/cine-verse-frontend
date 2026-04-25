@@ -1,13 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { api } from "@/lib/httpClient";
-
-export interface Category {
-  [x: string]: any;
-  id: string | number;
-  name: string;
-  movieCount?: number;
-  count?: number;
-}
+import { Category } from "@/types/category.types";
 
 export const categoryService = {
   async getCategories(params?: {
@@ -16,17 +9,26 @@ export const categoryService = {
   }): Promise<{
     data: Category[] | null;
     error: any;
+    success?: boolean;
   }> {
     try {
-      const response = await api.get("/categories", { params });
+      type CategoryServiceResponse = { data?: Category[] } | Category[];
+      const response = await api.get<CategoryServiceResponse>("/categories", {
+        params,
+      });
+      const responseData = response.data;
       // Handle different response structures
-      const categories = response.data?.data || response.data || [];
+      const categories = Array.isArray(responseData)
+        ? responseData
+        : responseData.data || [];
       return {
         data: Array.isArray(categories) ? categories : [],
         error: null,
+        success: true,
       };
     } catch (error: any) {
       return {
+        success: false,
         data: null,
         error: error.response?.data?.message || "Failed to fetch categories",
       };

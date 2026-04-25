@@ -1,22 +1,25 @@
-export type Movie = {
+import { Category } from "./category.types";
+
+export type PricingStatus = "FREE" | "PREMIUM";
+
+export interface MovieCount {
+  likes: number;
+  reviews: number;
+}
+
+export interface Movie {
   id: string;
   title: string;
-  genre: string[];
-  releaseDate: string;
-  director: string;
-  cast: string[];
   description: string;
-  posterUrl: string;
-  trailerUrl?: string;
-  duration: number; // in minutes
-  rating: number; // e.g., 0-10
-  status: MovieStatus;
+  releaseYear: string;
+  director: string;
+  cast: string;
+  videoUrl: string;
+  thumbnailUrl: string;
+  duration: number;
+  pricing: PricingStatus;
   createdAt: string;
   updatedAt: string;
-};
-
-export enum MovieStatus {
-  AVAILABLE = "AVAILABLE",
-  COMING_SOON = "COMING_SOON",
-  UNAVAILABLE = "UNAVAILABLE",
+  categories: Category[];
+  _count: MovieCount;
 }

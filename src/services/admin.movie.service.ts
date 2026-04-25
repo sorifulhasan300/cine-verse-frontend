@@ -2,11 +2,11 @@
 import { api } from "@/lib/httpClient";
 import { movieValidationSchema } from "@/zod/movie.validation";
 import z from "zod";
-
+import { MovieResponse } from "./movie.service";
 export type MovieFormData = z.infer<typeof movieValidationSchema>;
 
-export const movieManagementService = {
-  async getMovies(params?: {
+export const adminMovieService = {
+  async getMoviesAdmin(params?: {
     page?: number;
     limit?: number;
     searchTerm?: string;
@@ -17,24 +17,26 @@ export const movieManagementService = {
     data: any[] | null;
     pagination: any;
     error: any;
+    success?: boolean;
   }> {
     try {
-      const response = await api.get("/movie/admin", { params });
+      const response = await api.get<MovieResponse>("/movie/admin", { params });
       console.log("movies data", response);
       return {
+        success: true,
         data: response.data.data || [],
         pagination: response.data.meta || {},
         error: null,
       };
     } catch (error: any) {
       return {
+        success: false,
         data: null,
         pagination: null,
         error: error.response?.data?.message || "Failed to fetch movies",
       };
     }
   },
-
   async createMovie(movieData: MovieFormData): Promise<{
     data: any | null;
     error: any;
@@ -70,24 +72,6 @@ export const movieManagementService = {
       return {
         data: null,
         error: error.response?.data?.message || "Failed to update movie",
-      };
-    }
-  },
-
-  async getCategories(): Promise<{
-    data: any[] | null;
-    error: any;
-  }> {
-    try {
-      const response = await api.get("/categories");
-      return {
-        data: response.data || [],
-        error: null,
-      };
-    } catch (error: any) {
-      return {
-        data: null,
-        error: error.response?.data?.message || "Failed to fetch categories",
       };
     }
   },

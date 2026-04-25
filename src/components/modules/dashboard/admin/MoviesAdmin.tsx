@@ -3,7 +3,7 @@
 import { DataTable } from "@/components/ui/data-table";
 import { getMoviesColumns } from "./movies-columns";
 import { useQuery } from "@tanstack/react-query";
-import { movieManagementService, MovieFormData } from "@/services/movie-management.service";
+
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useDebounce } from "use-debounce";
@@ -12,6 +12,10 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { CreateMovieDialog } from "./CreateMovieDialog";
 import { SortingState, OnChangeFn } from "@tanstack/react-table";
+import {
+  adminMovieService,
+  MovieFormData,
+} from "@/services/admin.movie.service";
 
 export function MoviesAdmin() {
   const searchParams = useSearchParams();
@@ -23,7 +27,9 @@ export function MoviesAdmin() {
   const [debouncedSearchInput] = useDebounce(searchInput, 300);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
-  const [editingMovie, setEditingMovie] = useState<MovieFormData & { id: string } | undefined>(undefined);
+  const [editingMovie, setEditingMovie] = useState<
+    (MovieFormData & { id: string }) | undefined
+  >(undefined);
   const [sorting, setSorting] = useState<SortingState>([]);
 
   const handleSortingChange: OnChangeFn<SortingState> = (updaterOrValue) => {
@@ -64,7 +70,7 @@ export function MoviesAdmin() {
     queryKey: ["admin-movies", page, limit, searchTerm, sort, sortOrder],
     queryFn: async () => {
       console.log("Fetching movies...");
-      const response = await movieManagementService.getMovies({
+      const response = await adminMovieService.getMoviesAdmin({
         page,
         limit,
         searchTerm: searchTerm || undefined,
