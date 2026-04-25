@@ -4,9 +4,11 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
-import { Film, LogOut, User } from "lucide-react";
+import { Film, LogOut, User, Crown } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { UserType } from "@/types/user.types";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,10 +20,16 @@ import {
 export function Navbar() {
   const router = useRouter();
   const { data: session, isPending } = authClient.useSession();
-  const user = session?.user;
+  const user = session?.user as unknown as UserType | null;
   const [mounted, setMounted] = useState(false);
 
+  const isPremium = user?.plan && user?.currentPeriodEnd;
+  const endDate = user?.currentPeriodEnd
+    ? new Date(user.currentPeriodEnd).toLocaleDateString()
+    : null;
+
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 
@@ -33,7 +41,6 @@ export function Navbar() {
       console.error("Logout failed:", error);
     }
   };
-
   return (
     <nav className="bg-slate-950 border-b border-slate-800 px-4 py-3 flex items-center justify-between">
       {/* Left side - Logo */}
@@ -62,16 +69,38 @@ export function Navbar() {
                     {user.email.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
+                {isPremium && (
+                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-500 rounded-full flex items-center justify-center border border-slate-950">
+                    <Crown className="w-2.5 h-2.5 text-slate-950" />
+                  </div>
+                )}
               </div>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56 bg-slate-900 border-slate-700" align="end">
+            <DropdownMenuContent
+              className="w-56 bg-slate-900 border-slate-700"
+              align="end"
+            >
               <div className="px-2 py-1.5">
-                <p className="text-sm font-medium text-white">{user.name || "User"}</p>
+                <p className="text-sm font-medium text-white">
+                  {user.name || "User"}
+                </p>
                 <p className="text-xs text-slate-400">{user.email}</p>
+                {isPremium && (
+                  <div className="flex items-center gap-1 mt-1">
+                    <Crown className="w-3 h-3 text-yellow-500" />
+                    <span className="text-xs text-yellow-400">
+                      Premium {user.plan} • Valid until {endDate}
+                    </span>
+                  </div>
+                )}
               </div>
               <DropdownMenuSeparator className="bg-slate-700" />
               <DropdownMenuItem
-                onClick={() => router.push((user.role as string) === "admin" ? "/admin" : "/user")}
+                onClick={() =>
+                  router.push(
+                    (user.role as string) === "admin" ? "/admin" : "/user",
+                  )
+                }
                 className="text-slate-300 hover:text-white hover:bg-slate-800"
               >
                 <User className="mr-2 h-4 w-4" />

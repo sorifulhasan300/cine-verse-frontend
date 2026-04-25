@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { authClient } from "@/lib/auth-client";
 import { getRoutesForRole } from "./Dashboard.Routes";
-import { Film, LogOut, Settings, User as UserIcon } from "lucide-react";
+import { Film, LogOut, Settings, User as UserIcon, Crown } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -45,6 +45,11 @@ export function Sidebar({ onClose, isInDrawer = false }: SidebarProps) {
   const userRoutes = getRoutesForRole(
     (user as { role?: string })?.role as UserRole,
   );
+
+  const isPremium = user?.plan && user?.currentPeriodEnd;
+  const endDate = user?.currentPeriodEnd
+    ? new Date(user.currentPeriodEnd).toLocaleDateString()
+    : null;
 
   return (
     <aside
@@ -109,13 +114,20 @@ export function Sidebar({ onClose, isInDrawer = false }: SidebarProps) {
       {/* --- BOTTOM SECTION (User Profile) --- */}
       <div className="p-4 mt-auto">
         <div className="bg-white/[0.03] border border-white/5 rounded-2xl p-4 shadow-2xl">
-          <div className="flex items-center gap-3 mb-4">
-            <Avatar className="h-10 w-10 border-2 border-red-600/20">
-              <AvatarImage src={user.image || ""} />
-              <AvatarFallback className="bg-red-950 text-red-500 font-bold">
-                {user.email.charAt(0).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
+           <div className="flex items-center gap-3 mb-4">
+             <div className="relative">
+               <Avatar className="h-10 w-10 border-2 border-red-600/20">
+                 <AvatarImage src={user.image || ""} />
+                 <AvatarFallback className="bg-red-950 text-red-500 font-bold">
+                   {user.email.charAt(0).toUpperCase()}
+                 </AvatarFallback>
+               </Avatar>
+               {isPremium && (
+                 <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-500 rounded-full flex items-center justify-center border border-slate-950">
+                   <Crown className="w-2.5 h-2.5 text-slate-950" />
+                 </div>
+               )}
+             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-bold text-white truncate leading-none mb-1">
                 {user.name || "Cinema Fan"}
@@ -123,6 +135,14 @@ export function Sidebar({ onClose, isInDrawer = false }: SidebarProps) {
               <p className="text-[10px] text-slate-500 truncate uppercase tracking-tighter">
                 {user.role} Account
               </p>
+              {isPremium && (
+                <div className="flex items-center gap-1 mt-1">
+                  <Crown className="w-3 h-3 text-yellow-500" />
+                  <span className="text-[9px] text-yellow-400">
+                    Premium {user.plan} • Until {endDate}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
 
