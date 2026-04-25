@@ -46,15 +46,18 @@ export const subscriptionService = {
   },
 
   async checkSubscriptionStatus(): Promise<{
-    data: { status: string } | null;
-    error: any;
     success: boolean;
+    data: any;
+    message: string;
+    error: any;
   }> {
     try {
       const response = await api.get("/subscriptions/check-status");
+      const resData = response.data as string | any;
       return {
-        success: (response.data as any).success,
-        data: (response.data as any).data || null,
+        success: resData.status.success,
+        data: resData.status,
+        message: resData.message || "",
         error: null,
       };
     } catch (error: any) {
@@ -63,9 +66,11 @@ export const subscriptionService = {
         error.response?.data?.errorSources?.[0]?.message ||
         error.message ||
         "Failed to check subscription status";
+
       return {
         success: false,
         data: null,
+        message: errorMessage,
         error: errorMessage,
       };
     }
