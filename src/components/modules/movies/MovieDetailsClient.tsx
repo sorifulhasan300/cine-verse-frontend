@@ -241,7 +241,7 @@ export function MovieDetailsClient({
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Review Form */}
             <div>
-              <ReviewForm movieId={movie.id} />
+              <ReviewForm movieId={movie.id} existingReviews={movie.reviews} />
             </div>
 
             {/* Reviews Display */}

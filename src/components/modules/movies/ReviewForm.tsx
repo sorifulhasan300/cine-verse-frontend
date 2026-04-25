@@ -5,107 +5,78 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Star, Loader2 } from "lucide-react";
-import { useCreateReview } from "@/services/review.service";
 import { toast } from "sonner";
 import { z } from "zod";
+import { movieService } from "@/services/movie.service"; // আপনার সার্ভিস মেথড
+import { reviewService } from "@/services/review.service";
 
 interface ReviewFormProps {
   movieId: string;
 }
 
-// Zod schema for review validation
 const reviewSchema = z.object({
-  rating: z.number().min(1, "Please select a rating").max(5, "Rating must be between 1-5"),
-  text: z.string().min(6, "Review must be at least 6 characters long").max(1000, "Review must be less than 1000 characters"),
+  rating: z
+    .number()
+    .min(1, "Please select a rating")
+    .max(5, "Rating must be between 1-5"),
+  text: z
+    .string()
+    .min(6, "Review must be at least 6 characters long")
+    .max(1000, "Review must be less than 1000 characters"),
 });
-
-type ReviewFormData = z.infer<typeof reviewSchema>;
 
 export function ReviewForm({ movieId }: ReviewFormProps) {
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [text, setText] = useState("");
-  const [errors, setErrors] = useState<Partial<Record<keyof ReviewFormData, string>>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const createReview = useCreateReview();
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Clear previous errors
-    setErrors({});
+    const validation = reviewSchema.safeParse({ rating, text: text.trim() });
 
-    // Validate form data
-    const formData = {
-      rating,
-      text: text.trim(),
-    };
-
-    const validationResult = reviewSchema.safeParse(formData);
-
-    if (!validationResult.success) {
-      // Extract and set validation errors
-      const fieldErrors: Partial<Record<keyof ReviewFormData, string>> = {};
-      validationResult.error.errors.forEach((error) => {
-        // Safely access the first path element
-        const field = error.path?.[0] as keyof ReviewFormData;
-        if (field) {
-          fieldErrors[field] = error.message;
-        }
-      });
-      setErrors(fieldErrors);
+    if (!validation.success) {
+      toast.error(validation.error.issues[0].message);
       return;
     }
 
-    createReview.mutate(
-      {
+    setIsSubmitting(true);
+
+    try {
+      const { success, message } = await reviewService.createReview({
         movieId,
-        rating: validationResult.data.rating,
-        text: validationResult.data.text,
-      },
-      {
-        onSuccess: (data) => {
-          if (data.success) {
-            toast.success("Review submitted successfully!");
-            setRating(0);
-            setText("");
-            setErrors({});
-          } else {
-            // Handle backend validation errors
-            if (data.message.includes("Validation Error")) {
-              toast.error("Please check your input and try again");
-            } else {
-              toast.error(data.message || "Failed to submit review");
-            }
-          }
-        },
-        onError: (error: unknown) => {
-          // Handle network or other errors
-          let errorMessage = "Failed to submit review";
+        rating: validation.data.rating,
+        text: validation.data.text,
+      });
 
-          if (error && typeof error === 'object' && 'response' in error) {
-            const axiosError = error as { response?: { data?: { message?: string } } };
-            errorMessage = axiosError.response?.data?.message || errorMessage;
-          }
-
-          toast.error(errorMessage);
-        },
+      if (success) {
+        toast.success("Review submitted successfully!");
+        setRating(0);
+        setText("");
+      } else {
+        toast.error(message || "Something went wrong");
       }
-    );
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <Card className="bg-slate-900 border-slate-800">
       <CardHeader>
-        <CardTitle className="text-white">Write a Review</CardTitle>
+        <CardTitle className="text-white text-lg">Write a Review</CardTitle>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Rating Stars */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-300">
-              Rating *
-            </label>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Rating Section */}
+          <div className="flex flex-col gap-2">
+            <span className="text-sm font-medium text-slate-300">
+              Your Rating
+            </span>
             <div className="flex gap-1">
               {[1, 2, 3, 4, 5].map((star) => (
                 <button
@@ -114,70 +85,42 @@ export function ReviewForm({ movieId }: ReviewFormProps) {
                   onClick={() => setRating(star)}
                   onMouseEnter={() => setHoverRating(star)}
                   onMouseLeave={() => setHoverRating(0)}
-                  className="p-1 transition-colors hover:scale-110"
+                  className="transition-transform hover:scale-110 focus:outline-none"
                 >
                   <Star
-                    className={`w-6 h-6 ${
+                    className={`w-7 h-7 ${
                       star <= (hoverRating || rating)
                         ? "fill-yellow-400 text-yellow-400"
-                        : "text-slate-600 hover:text-yellow-400/50"
+                        : "text-slate-600"
                     }`}
                   />
                 </button>
               ))}
             </div>
-            {rating > 0 && (
-              <p className="text-sm text-slate-400">
-                {rating} star{rating !== 1 ? "s" : ""}
-              </p>
-            )}
-            {errors.rating && (
-              <p className="text-sm text-red-400">{errors.rating}</p>
-            )}
           </div>
 
-          {/* Review Text */}
+          {/* Comment Section */}
           <div className="space-y-2">
-            <label
-              htmlFor="review-text"
-              className="text-sm font-medium text-slate-300"
-            >
-              Your Review *
-            </label>
             <Textarea
-              id="review-text"
-              placeholder="Share your thoughts about this movie..."
+              placeholder="What did you think of the movie?"
               value={text}
               onChange={(e) => setText(e.target.value)}
-              className={`bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 resize-none ${
-                errors.text ? "border-red-500 focus:border-red-500" : ""
-              }`}
-              rows={4}
+              className="bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 resize-none min-h-[100px] focus:ring-red-500"
             />
-            <div className="flex justify-between">
-              {errors.text && (
-                <p className="text-sm text-red-400">{errors.text}</p>
-              )}
-              <p className="text-sm text-slate-500 ml-auto">
-                {text.length}/1000 characters
-              </p>
-            </div>
+            <p className="text-[10px] text-slate-500 text-right">
+              {text.length}/1000
+            </p>
           </div>
 
-          {/* Submit Button */}
           <Button
             type="submit"
-            disabled={createReview.isPending}
-            className="w-full bg-red-600 hover:bg-red-700"
+            disabled={isSubmitting}
+            className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold transition-all"
           >
-            {createReview.isPending ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Submitting...
-              </>
-            ) : (
-              "Submit Review"
-            )}
+            {isSubmitting ? (
+              <Loader2 className="w-4 h-4 animate-spin mr-2" />
+            ) : null}
+            {isSubmitting ? "Posting..." : "Post Review"}
           </Button>
         </form>
       </CardContent>

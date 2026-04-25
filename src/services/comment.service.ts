@@ -10,46 +10,30 @@ export interface CreateCommentRequest {
 
 export interface CreateCommentResponse {
   success: boolean;
-  data: Comment;
   message?: string;
 }
 
 export const commentService = {
-  async createComment(commentData: CreateCommentRequest): Promise<CreateCommentResponse> {
+  async createComment(
+    commentData: CreateCommentRequest,
+  ): Promise<CreateCommentResponse> {
     try {
-      const response = await api.post<Comment>("/comments", commentData);
+      await api.post("/comments", commentData);
       return {
         success: true,
-        data: response.data,
         message: "Comment posted successfully",
       };
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Failed to post comment";
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      const backendMessage = error.response?.data?.message;
+      const errorSourceMessage =
+        error.response?.data?.errorSources?.[0]?.message;
+
       return {
         success: false,
-        data: {} as Comment,
-        message: errorMessage,
+        message:
+          errorSourceMessage || backendMessage || "Failed to post comment",
       };
     }
   },
-};
-
-export const useCreateComment = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: commentService.createComment,
-    onSuccess: (data, variables) => {
-      if (data.success) {
-        // Invalidate movie details queries to refetch with new comment
-        queryClient.invalidateQueries({
-          queryKey: ["movie"],
-        });
-        // Could also invalidate specific review queries if they exist
-        queryClient.invalidateQueries({
-          queryKey: ["review", variables.reviewId],
-        });
-      }
-    },
-  });
 };

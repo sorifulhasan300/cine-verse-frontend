@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/httpClient";
 import { Review } from "@/types/movie.types";
@@ -10,46 +11,36 @@ export interface CreateReviewRequest {
 
 export interface CreateReviewResponse {
   success: boolean;
-  data: Review;
+  data: Review | null;
   message?: string;
 }
 
 export const reviewService = {
-  async createReview(reviewData: CreateReviewRequest): Promise<CreateReviewResponse> {
+  async createReview(
+    reviewData: CreateReviewRequest,
+  ): Promise<CreateReviewResponse> {
     try {
-      const response = await api.post<Review>("/review", reviewData);
+      await api.post("/review", reviewData);
       return {
         success: true,
-        data: response.data,
+        data: null,
         message: "Review submitted successfully",
       };
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Failed to submit review";
+    } catch (error: any) {
+      // Axios error handling
+      const backendMessage = error.response?.data?.message;
+      const errorSourceMessage =
+        error.response?.data?.errorSources?.[0]?.message;
+
       return {
         success: false,
-        data: {} as Review,
-        message: errorMessage,
+        data: null,
+        message:
+          errorSourceMessage ||
+          backendMessage ||
+          error.message ||
+          "Failed to submit review",
       };
     }
   },
-};
-
-export const useCreateReview = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: reviewService.createReview,
-    onSuccess: (data, variables) => {
-      if (data.success) {
-        // Invalidate movie details queries to refetch with new review
-        queryClient.invalidateQueries({
-          queryKey: ["movie", variables.movieId],
-        });
-        // Invalidate movies list queries
-        queryClient.invalidateQueries({
-          queryKey: ["movies"],
-        });
-      }
-    },
-  });
 };

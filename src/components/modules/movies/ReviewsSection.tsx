@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState } from "react";
@@ -5,17 +6,16 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Star, MessageCircle, Loader2, Send } from "lucide-react";
+import { Star, MessageCircle, Loader2, Send, X } from "lucide-react";
 import { Review } from "@/types/movie.types";
-import { useCreateComment } from "@/services/comment.service";
 import { toast } from "sonner";
 import { z } from "zod";
+import { commentService } from "@/services/comment.service";
 
 interface ReviewsSectionProps {
   reviews: Review[];
 }
 
-// Zod schema for comment validation
 const commentSchema = z.object({
   text: z
     .string()
@@ -26,70 +26,48 @@ const commentSchema = z.object({
 export function ReviewsSection({ reviews }: ReviewsSectionProps) {
   const [commentingOn, setCommentingOn] = useState<string | null>(null);
   const [commentText, setCommentText] = useState("");
-  const [commentErrors, setCommentErrors] = useState<string>("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const createComment = useCreateComment();
+  const handleCommentSubmit = async (reviewId: string) => {
+    const validation = commentSchema.safeParse({ text: commentText.trim() });
 
-  const handleCommentSubmit = (reviewId: string, parentId?: string) => {
-    // Clear previous errors
-    setCommentErrors("");
-
-    // Validate comment
-    const validationResult = commentSchema.safeParse({
-      text: commentText.trim(),
-    });
-
-    if (!validationResult.success) {
-      const errorMessage =
-        validationResult.error.issues?.[0]?.message || "Invalid comment";
-      setCommentErrors(errorMessage);
+    if (!validation.success) {
+      toast.error(validation.error.issues[0].message);
       return;
     }
 
-    createComment.mutate(
-      {
+    setIsSubmitting(true);
+
+    try {
+      const response = await commentService.createComment({
         reviewId,
-        parentId,
-        text: validationResult.data.text,
-      },
-      {
-        onSuccess: (data) => {
-          if (data.success) {
-            toast.success("Comment posted successfully!");
-            setCommentText("");
-            setCommentingOn(null);
-            setCommentErrors("");
-          } else {
-            // Handle backend validation errors
-            if ((data.message ?? "").includes("Validation Error")) {
-              toast.error("Please check your comment and try again");
-            } else {
-              toast.error(data.message || "Failed to post comment");
-            }
-          }
-        },
-        onError: (error: unknown) => {
-          // Handle network or other errors
-          let errorMessage = "Failed to post comment";
+        text: validation.data.text,
+      });
 
-          if (error && typeof error === "object" && "response" in error) {
-            const axiosError = error as {
-              response?: { data?: { message?: string } };
-            };
-            errorMessage = axiosError.response?.data?.message || errorMessage;
-          }
+      if (response.success) {
+        toast.success("Comment posted successfully!");
+        setCommentText("");
+        setCommentingOn(null);
+      } else {
+        toast.error(response.message || "Failed to post comment");
+      }
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.errorSources?.[0]?.message ||
+        error.response?.data?.message ||
+        "Something went wrong";
 
-          toast.error(errorMessage);
-        },
-      },
-    );
+      toast.error(errorMessage);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, i) => (
       <Star
         key={i}
-        className={`w-4 h-4 ${
+        className={`w-3.5 h-3.5 ${
           i < rating ? "fill-yellow-400 text-yellow-400" : "text-slate-600"
         }`}
       />
@@ -98,120 +76,93 @@ export function ReviewsSection({ reviews }: ReviewsSectionProps) {
 
   if (reviews.length === 0) {
     return (
-      <Card className="bg-slate-900 border-slate-800">
-        <CardContent className="p-6 text-center">
-          <p className="text-slate-400">
-            No reviews yet. Be the first to review!
-          </p>
-        </CardContent>
-      </Card>
+      <div className="text-center py-10 bg-slate-900/50 rounded-xl border border-slate-800">
+        <p className="text-slate-400">
+          No reviews yet. Be the first to review!
+        </p>
+      </div>
     );
   }
 
   return (
     <div className="space-y-6">
       {reviews.map((review) => (
-        <Card key={review.id} className="bg-slate-900 border-slate-800">
+        <Card
+          key={review.id}
+          className="bg-slate-900 border-slate-800 overflow-hidden"
+        >
           <CardContent className="p-6">
             <div className="flex gap-4">
-              <Avatar className="w-10 h-10">
-                <AvatarFallback>
+              <Avatar className="w-10 h-10 border border-slate-700">
+                <AvatarFallback className="bg-slate-800 text-slate-200">
                   {review.user.name.charAt(0).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
+
               <div className="flex-1">
-                <div className="flex items-center gap-3 mb-3">
-                  <span className="font-medium text-white">
-                    {review.user.name}
-                  </span>
-                  <div className="flex items-center gap-1">
-                    {renderStars(review.rating)}
+                <div className="flex items-center justify-between mb-2">
+                  <div>
+                    <h4 className="font-semibold text-white text-sm">
+                      {review.user.name}
+                    </h4>
+                    <div className="flex items-center gap-1 mt-1">
+                      {renderStars(review.rating)}
+                    </div>
                   </div>
-                  <span className="text-xs text-slate-500">
+                  <span className="text-[10px] text-slate-500 uppercase tracking-wider">
                     {new Date(review.createdAt).toLocaleDateString()}
                   </span>
                 </div>
-                <p className="text-slate-300 mb-4">{review.comment}</p>
 
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() =>
-                    setCommentingOn(
-                      commentingOn === review.id ? null : review.id,
-                    )
-                  }
-                  className="text-slate-400 hover:text-slate-300 p-0 h-auto mb-4"
-                >
-                  <MessageCircle className="w-4 h-4 mr-1" />
-                  Add Comment
-                </Button>
+                <p className="text-slate-300 text-sm leading-relaxed mb-4">
+                  {review.comment}
+                </p>
 
+                {/* Interaction Bar */}
+                <div className="flex items-center gap-4">
+                  <button
+                    onClick={() => {
+                      setCommentingOn(
+                        commentingOn === review.id ? null : review.id,
+                      );
+                      setCommentText("");
+                    }}
+                    className="flex items-center text-xs font-medium text-slate-400 hover:text-red-500 transition-colors"
+                  >
+                    <MessageCircle className="w-4 h-4 mr-1.5" />
+                    {commentingOn === review.id ? "Cancel" : "Reply"}
+                  </button>
+                </div>
+
+                {/* Comment Input Area */}
                 {commentingOn === review.id && (
-                  <div className="space-y-2 mb-4">
+                  <div className="mt-4 space-y-3 p-4 bg-slate-800/50 rounded-lg border border-slate-700/50 animate-in fade-in slide-in-from-top-2">
                     <Textarea
-                      placeholder="Write a comment..."
+                      placeholder="Write your reply..."
                       value={commentText}
                       onChange={(e) => setCommentText(e.target.value)}
-                      className={`bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 resize-none ${
-                        commentErrors
-                          ? "border-red-500 focus:border-red-500"
-                          : ""
-                      }`}
-                      rows={3}
+                      className="bg-slate-900 border-slate-700 text-sm text-white placeholder:text-slate-500 min-h-[80px] focus:ring-1 focus:ring-red-500"
                     />
-                    <div className="flex justify-between items-start">
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          onClick={() => handleCommentSubmit(review.id)}
-                          disabled={createComment.isPending}
-                          className="bg-red-600 hover:bg-red-700"
-                        >
-                          {createComment.isPending ? (
-                            <Loader2 className="w-3 h-3 mr-1 animate-spin" />
-                          ) : (
-                            <Send className="w-3 h-3 mr-1" />
-                          )}
-                          Comment
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => {
-                            setCommentingOn(null);
-                            setCommentText("");
-                            setCommentErrors("");
-                          }}
-                          className="text-slate-400 hover:text-slate-300"
-                        >
-                          Cancel
-                        </Button>
-                      </div>
-                      <div className="flex flex-col items-end">
-                        {commentErrors && (
-                          <p className="text-sm text-red-400 mb-1">
-                            {commentErrors}
-                          </p>
+                    <div className="flex justify-between items-center">
+                      <p className="text-[10px] text-slate-500">
+                        {commentText.length}/500 characters
+                      </p>
+                      <Button
+                        size="sm"
+                        onClick={() => handleCommentSubmit(review.id)}
+                        disabled={isSubmitting || commentText.length < 3}
+                        className="bg-red-600 hover:bg-red-700 h-8 px-4"
+                      >
+                        {isSubmitting ? (
+                          <Loader2 className="w-3 h-3 animate-spin" />
+                        ) : (
+                          <Send className="w-3 h-3 mr-2" />
                         )}
-                        <p className="text-xs text-slate-500">
-                          {commentText.length}/500
-                        </p>
-                      </div>
+                        Post
+                      </Button>
                     </div>
                   </div>
                 )}
-
-                {/* Comments */}
-                <div className="space-y-4">
-                  <h4 className="text-sm font-medium text-slate-300">
-                    Comments
-                  </h4>
-                  {/* We'll need to fetch comments for each review - for now showing placeholder */}
-                  <p className="text-slate-500 text-sm">
-                    Comments feature will be implemented with API integration
-                  </p>
-                </div>
               </div>
             </div>
           </CardContent>
