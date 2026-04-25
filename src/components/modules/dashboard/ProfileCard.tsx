@@ -219,7 +219,7 @@ function ProfileCard({ user, variant = "user" }: ProfileCardProps) {
                   setIsEditing(false);
                   form.reset();
                 }}
-                className="border-slate-600 text-black cursor-pointer hover:bg-slate-700"
+                className="border-slate-600 text-white cursor-pointer hover:bg-slate-700"
               >
                 <X className="w-4 h-4 mr-2" />
                 Cancel

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import { Film, LogOut, User, Crown } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -19,6 +19,7 @@ import {
 
 export function Navbar() {
   const router = useRouter();
+  const pathname = usePathname();
   const { data: session, isPending } = authClient.useSession();
   const user = session?.user as unknown as UserType | null;
   const [mounted, setMounted] = useState(false);
@@ -27,6 +28,13 @@ export function Navbar() {
   const endDate = user?.currentPeriodEnd
     ? new Date(user.currentPeriodEnd).toLocaleDateString()
     : null;
+
+  const isActiveLink = (href: string) => {
+    if (href === "/") {
+      return pathname === "/";
+    }
+    return pathname.startsWith(href);
+  };
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -52,6 +60,60 @@ export function Navbar() {
           Cine<span className="text-red-600">Verse</span>
         </span>
       </Link>
+
+      {/* Center - Navigation Links */}
+      <div className="hidden md:flex items-center gap-6">
+        <Link
+          href="/"
+          className={`font-medium transition-colors ${
+            isActiveLink("/")
+              ? "text-red-500 border-b-2 border-red-500 pb-1"
+              : "text-slate-300 hover:text-white"
+          }`}
+        >
+          Home
+        </Link>
+        <Link
+          href="/movies"
+          className={`font-medium transition-colors ${
+            isActiveLink("/movies")
+              ? "text-red-500 border-b-2 border-red-500 pb-1"
+              : "text-slate-300 hover:text-white"
+          }`}
+        >
+          All Movies
+        </Link>
+        <Link
+          href="/helpline"
+          className={`font-medium transition-colors ${
+            isActiveLink("/helpline")
+              ? "text-red-500 border-b-2 border-red-500 pb-1"
+              : "text-slate-300 hover:text-white"
+          }`}
+        >
+          Helpline
+        </Link>
+        <Link
+          href="/faq"
+          className={`font-medium transition-colors ${
+            isActiveLink("/faq")
+              ? "text-red-500 border-b-2 border-red-500 pb-1"
+              : "text-slate-300 hover:text-white"
+          }`}
+        >
+          FAQ
+        </Link>
+        <Link
+          href="/about"
+          className={`font-medium transition-colors ${
+            isActiveLink("/about")
+              ? "text-red-500 border-b-2 border-red-500 pb-1"
+              : "text-slate-300 hover:text-white"
+          }`}
+        >
+          About
+        </Link>
+      </div>
 
       {/* Right side - User menu or login */}
       <div className="flex items-center gap-4">

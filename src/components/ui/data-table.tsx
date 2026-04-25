@@ -137,7 +137,7 @@ export function DataTable<TData, TValue>({
               <select
                 value={pagination.limit}
                 onChange={(e) => onLimitChange?.(Number(e.target.value))}
-                className="h-8 w-[70px] rounded border border-red-500/20 bg-black/20 px-2 text-sm text-black"
+                className="h-8 w-[70px] rounded border border-red-500/20 bg-black/20 px-2 text-sm text-white"
               >
                 {[5, 10, 20, 50].map((size) => (
                   <option key={size} value={size}>
