@@ -10,7 +10,20 @@ interface MovieDetailsPageProps {
 export default async function MovieDetailsPage({
   params,
 }: MovieDetailsPageProps) {
-  const { id } = await params;
+  const resolvedParams = await params;
+
+  if (!resolvedParams?.id) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <p className="text-red-400 text-lg mb-4">Invalid movie ID</p>
+          <p className="text-slate-400">The movie ID is missing or invalid.</p>
+        </div>
+      </div>
+    );
+  }
+
+  const { id } = resolvedParams;
   console.log("id:", id);
   const queryClient = new QueryClient();
   const queryKey = ["movie", id];

@@ -123,7 +123,7 @@ export function Navbar() {
           </div>
         ) : user ? (
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+            <DropdownMenuTrigger>
               <div className="relative h-8 w-8 rounded-full hover:bg-slate-800/50 transition-colors cursor-pointer">
                 <Avatar className="h-8 w-8 border-2 border-red-600/20">
                   <AvatarImage src={user.image || ""} />

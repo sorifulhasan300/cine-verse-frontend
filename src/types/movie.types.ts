@@ -27,6 +27,20 @@ export interface Like {
   createdAt: string;
 }
 
+export interface Comment {
+  id: string;
+  text: string;
+  reviewId: string;
+  parentId?: string;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+  };
+  createdAt: string;
+  replies?: Comment[];
+}
+
 export interface Movie {
   id: string;
   title: string;

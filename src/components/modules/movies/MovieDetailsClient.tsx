@@ -13,9 +13,12 @@ import { MovieDetails } from "@/types/movie.types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Loader2, Star, Clock, Calendar, User, Users } from "lucide-react";
+import { Loader2, Clock, Calendar, User, Users } from "lucide-react";
 import { MoviePlayer } from "./MoviePlayer";
 import { authClient } from "@/lib/auth-client";
+import { LikeButton } from "./LikeButton";
+import { ReviewForm } from "./ReviewForm";
+import { ReviewsSection } from "./ReviewsSection";
 
 interface MovieDetailsClientProps {
   id: string;
@@ -27,7 +30,7 @@ export function MovieDetailsClient({
   dehydratedState,
 }: MovieDetailsClientProps) {
   const router = useRouter();
-  const { data: session, isPending } = authClient.useSession();
+  const { data: session } = authClient.useSession();
 
   const userPlan = (session?.user as any)?.plan || "FREE";
 
@@ -174,10 +177,11 @@ export function MovieDetailsClient({
 
             {/* Stats */}
             <div className="flex items-center gap-6 text-slate-400">
-              <div className="flex items-center gap-2">
-                <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                <span>{movie._count.likes} likes</span>
-              </div>
+              <LikeButton
+                movieId={movie.id}
+                initialLikes={movie._count.likes}
+                isInitiallyLiked={movie.likes.some(like => like.userId === session?.user?.id)}
+              />
               <div className="flex items-center gap-2">
                 <Users className="w-4 h-4" />
                 <span>{movie._count.reviews} reviews</span>
@@ -229,6 +233,24 @@ export function MovieDetailsClient({
                 </div>
               </CardContent>
             </Card>
+          </div>
+        </div>
+
+        {/* Reviews Section */}
+        <div className="mt-12 space-y-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Review Form */}
+            <div>
+              <ReviewForm movieId={movie.id} />
+            </div>
+
+            {/* Reviews Display */}
+            <div>
+              <h2 className="text-2xl font-bold text-white mb-6">
+                Reviews ({movie._count.reviews})
+              </h2>
+              <ReviewsSection reviews={movie.reviews} />
+            </div>
           </div>
         </div>
       </div>
