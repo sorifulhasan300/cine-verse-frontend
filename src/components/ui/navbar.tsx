@@ -180,21 +180,23 @@ export function Navbar() {
           </DropdownMenu>
         ) : (
           <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-slate-300 hover:text-white hover:bg-slate-800"
-              asChild
-            >
-              <Link href="/login">Login</Link>
-            </Button>
-            <Button
-              size="sm"
-              className="bg-red-600 hover:bg-red-700 text-white"
-              asChild
-            >
-              <Link href="/register">Sign Up</Link>
-            </Button>
+            <Link href="/login">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-slate-300 hover:text-white hover:bg-slate-800"
+              >
+                Login
+              </Button>
+            </Link>
+            <Link href="/register">
+              <Button
+                size="sm"
+                className="bg-red-600 hover:bg-red-700 text-white"
+              >
+                Sign Up
+              </Button>
+            </Link>
           </div>
         )}
       </div>

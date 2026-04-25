@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Film, Star, Clock, Calendar } from "lucide-react";
 import Image from "next/image";
 import { Movie } from "@/types/movie.types";
+import Link from "next/link";
 
 interface MovieCardProps {
   movie: Movie;
@@ -69,10 +70,13 @@ export function MovieCard({ movie }: MovieCardProps) {
           {movie.description}
         </p>
 
-        <Button className="w-full bg-red-600 hover:bg-red-700">
+        <Link
+          href={`/movies/${movie.id}`}
+          className="w-full bg-red-600 hover:bg-red-700"
+        >
           <Film className="w-4 h-4 mr-2" />
           Watch Now
-        </Button>
+        </Link>
       </CardContent>
     </Card>
   );

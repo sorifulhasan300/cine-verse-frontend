@@ -1,10 +1,30 @@
 import { Category } from "./category.types";
+import { WatchListItem } from "./watch-list.types";
 
 export type PricingStatus = "FREE" | "PREMIUM";
 
 export interface MovieCount {
   likes: number;
   reviews: number;
+}
+
+export interface Review {
+  id: string;
+  rating: number;
+  comment: string;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+  };
+  createdAt: string;
+}
+
+export interface Like {
+  id: string;
+  userId: string;
+  movieId: string;
+  createdAt: string;
 }
 
 export interface Movie {
@@ -22,4 +42,10 @@ export interface Movie {
   updatedAt: string;
   categories: Category[];
   _count: MovieCount;
+}
+
+export interface MovieDetails extends Movie {
+  reviews: Review[];
+  likes: Like[];
+  watchLists: WatchListItem[];
 }

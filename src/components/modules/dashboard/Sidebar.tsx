@@ -11,6 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { UserRole } from "@/types/role.types";
+import { UserType } from "@/types/user.types";
 
 interface SidebarProps {
   onClose?: () => void;
@@ -20,7 +21,7 @@ interface SidebarProps {
 export function Sidebar({ onClose, isInDrawer = false }: SidebarProps) {
   const pathname = usePathname();
   const { data: session, isPending } = authClient.useSession();
-  const user = session?.user;
+  const user = session?.user as unknown as UserType | null;
 
   if (isPending) {
     return (

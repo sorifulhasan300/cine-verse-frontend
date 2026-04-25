@@ -2,6 +2,7 @@
 import { api } from "@/lib/httpClient";
 import { movieValidationSchema } from "@/zod/movie.validation";
 import z from "zod";
+import { MovieDetails } from "@/types/movie.types";
 
 export interface MovieResponse {
   data: any[];
@@ -36,6 +37,37 @@ export const movieService = {
         data: null,
         pagination: null,
         error: error.response?.data?.message || "Failed to fetch movies",
+      };
+    }
+  },
+
+  async getMovieDetails(id: string): Promise<{
+    data: MovieDetails | null;
+    error: string | null;
+    success: boolean;
+    redirectTo?: string;
+  }> {
+    try {
+      const response = await api.get(`/movie/${id}`);
+      return {
+        success: true,
+        data: response.data as MovieDetails,
+        error: null,
+      };
+    } catch (error: any) {
+      const errorData = error.response?.data;
+      if (errorData?.redirectTo) {
+        return {
+          success: false,
+          data: null,
+          error: errorData.message,
+          redirectTo: errorData.redirectTo,
+        };
+      }
+      return {
+        success: false,
+        data: null,
+        error: errorData?.message || "Failed to fetch movie details",
       };
     }
   },
