@@ -4,12 +4,10 @@ import { session } from "@/types/session.types";
 
 const BACKEND_URL = env.NEXT_PUBLIC_BACKEND_URL;
 
-// ─── Middleware এর ভেতরে use করো ───
 export async function getSessionFromRequest(request: NextRequest) {
   try {
     const response = await fetch(`${BACKEND_URL}/api/auth/get-session`, {
       headers: {
-        // Browser এর cookie টা backend এ forward করছি
         cookie: request.headers.get("cookie") ?? "",
       },
     });
@@ -25,7 +23,6 @@ export async function getSessionFromRequest(request: NextRequest) {
   }
 }
 
-// ─── Server Component / Route Handler এ use করো ───
 export async function getCurrentUser() {
   try {
     const { headers } = await import("next/headers");
@@ -34,7 +31,6 @@ export async function getCurrentUser() {
 
     const response = await fetch(`${BACKEND_URL}/api/auth/get-session`, {
       headers: { cookie },
-      // Server Component এ cache বন্ধ রাখা ভালো
       cache: "no-store",
     });
 

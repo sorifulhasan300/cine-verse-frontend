@@ -4,9 +4,8 @@ import { getSessionFromRequest } from "./lib/auth-session";
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  const session = await getSessionFromRequest(request); // ← request পাঠাও
-  console.log("session", session);
-  // Login/Register এ আছে + session আছে → dashboard এ পাঠাও
+  const session = await getSessionFromRequest(request);
+
   if (
     session &&
     (pathname.startsWith("/login") || pathname.startsWith("/register"))
