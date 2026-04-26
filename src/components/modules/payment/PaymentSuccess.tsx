@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { subscriptionService } from "@/services/subscription.service";
+import { updateSession } from "@/lib/auth-client";
 import Link from "next/link";
 
 interface SubscriptionStatus {
@@ -33,6 +34,8 @@ export default function PaymentSuccess() {
         setStatus(response.data as any);
         setError(null);
         setLoading(false);
+        // Update session to reflect new subscription status
+        await updateSession();
       } else {
         setError(response.message || "Failed to verify subscription");
         setStatus(null);
@@ -41,11 +44,12 @@ export default function PaymentSuccess() {
     } catch {
       setError("An error occurred while verifying your subscription");
       setStatus(null);
+    } finally {
+      setRefreshing(false);
     }
   };
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     checkStatus();
   }, []);
 
