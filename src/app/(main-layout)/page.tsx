@@ -4,11 +4,15 @@ import { TrendingMovies } from "@/components/ui/trending-movies";
 import { MovieCategories } from "@/components/ui/movie-categories";
 import { WhyChooseUs } from "@/components/ui/why-choose-us";
 import { PricingSection } from "@/components/ui/pricing-section";
-import { get } from "http";
 import { getCurrentUser } from "@/lib/auth-session";
 
 async function MainLayoutPage() {
-  const session = await getCurrentUser();
+  let session = null;
+  try {
+    session = await getCurrentUser();
+  } catch (error) {
+    console.error("Failed to get current user:", error);
+  }
   const user = session?.user;
   return (
     <div>

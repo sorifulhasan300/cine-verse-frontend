@@ -116,25 +116,7 @@ export function TrendingMovies() {
         {/* Movies Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           {movies?.map((movie) => (
-            <MovieCard
-              key={movie.id}
-              movie={{
-                id: String(movie.id),
-                title: movie.title,
-                description: movie.description || '',
-                thumbnailUrl: movie.image || '',
-                releaseYear: movie.year.toString(),
-                director: '',
-                cast: '',
-                videoUrl: '',
-                duration: parseInt(movie.duration) || 0,
-                pricing: 'FREE',
-                createdAt: '',
-                updatedAt: '',
-                categories: [],
-                _count: { likes: 0, reviews: 0 },
-              } as Movie}
-            />
+            <MovieCard key={movie.id} movie={movie as Movie} />
           ))}
         </div>
 

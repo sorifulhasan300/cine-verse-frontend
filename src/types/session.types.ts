@@ -9,5 +9,11 @@ export type session = {
     role?: string;
     plan?: SubscriptionPlan;
   };
-  session?: any;
+  session?: {
+    id: string;
+    userId: string;
+    expiresAt: Date;
+    ipAddress?: string;
+    userAgent?: string;
+  };
 };
