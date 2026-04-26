@@ -30,29 +30,26 @@ A modern, full-featured movie streaming platform built with Next.js, offering un
 ## Prerequisites
 
 - Node.js 18+
-- npm, yarn, pnpm, or bun
+-  pnpm or bun
 
 ## Installation
 
 1. Clone the repository:
+
 ```bash
-git clone <repository-url>
+git clone <https://github.com/sorifulhasan300/cine-verse-frontend>
 cd cine-verse-frontend
 ```
 
 2. Install dependencies:
+
 ```bash
-npm install
-# or
-yarn install
-# or
 pnpm install
-# or
-bun install
-```
+
 
 3. Set up environment variables:
-Create a `.env.local` file in the root directory and add your configuration:
+   Create a `.env.local` file in the root directory and add your configuration:
+
 ```env
 # Database URL
 DATABASE_URL="your-database-connection-string"
@@ -65,6 +62,7 @@ BETTER_AUTH_URL="http://localhost:3000"
 ```
 
 4. Run database migrations (if using Prisma):
+
 ```bash
 npx prisma migrate dev
 ```
@@ -74,13 +72,8 @@ npx prisma migrate dev
 Start the development server:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
 pnpm dev
-# or
-bun dev
+
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
@@ -109,10 +102,8 @@ src/
 
 ## Scripts
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run start` - Start production server
-- `npm run lint` - Run ESLint
+- `pnpm run dev` - Start development server
+- `pnpm run build` - Build for production
 
 ## Contributing
 
