@@ -4,7 +4,7 @@ import { watchListService } from "../../../../services/watch-list.service";
 
 async function WatchListPage() {
   const { data: watchList, error } = await watchListService.getMyWatchList();
-
+  console.log(watchList);
   if (error) {
     return (
       <div className="p-6 text-center">

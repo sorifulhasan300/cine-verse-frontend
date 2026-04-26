@@ -3,7 +3,15 @@
 import React, { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Film, Target, Heart, Zap, Eye, Laugh } from "lucide-react";
-import { categoryService, Category } from "@/services/category.service";
+import { categoryService } from "@/services/category.service";
+import { Category } from "@/types/category.types";
+
+type CategoryWithMeta = Category & {
+  icon: React.ComponentType<{ className?: string }>;
+  color: string;
+  description: string;
+  count: number;
+};
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Action: Target,
@@ -33,7 +41,7 @@ const descriptionMap: Record<string, string> = {
 };
 
 export function MovieCategories() {
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [categories, setCategories] = useState<CategoryWithMeta[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -46,7 +54,7 @@ export function MovieCategories() {
         }
 
         const apiCategories = response.data || [];
-        const categoriesWithMeta: Category[] = apiCategories.slice(0, 6).map((category) => ({
+        const categoriesWithMeta: CategoryWithMeta[] = apiCategories.slice(0, 6).map((category) => ({
           ...category,
           icon: iconMap[category.name] || Film,
           color: colorMap[category.name] || "from-gray-600 to-gray-500",

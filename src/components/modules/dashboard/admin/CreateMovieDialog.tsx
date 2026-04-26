@@ -76,6 +76,7 @@ export function CreateMovieDialog({
       cast: editingMovie?.cast || "",
       videoUrl: editingMovie?.videoUrl || "",
       thumbnailUrl: editingMovie?.thumbnailUrl || "",
+      duration: editingMovie?.duration || 0,
       pricing: editingMovie?.pricing || "FREE",
       categoryIds: editingMovie?.categoryIds || [],
     },
@@ -95,6 +96,7 @@ export function CreateMovieDialog({
         cast: editingMovie.cast || "",
         videoUrl: editingMovie.videoUrl || "",
         thumbnailUrl: editingMovie.thumbnailUrl || "",
+        duration: editingMovie.duration || 0,
         pricing: editingMovie.pricing || "FREE",
         categoryIds: editingMovie.categoryIds || [],
       });
@@ -224,9 +226,24 @@ export function CreateMovieDialog({
                 {form.formState.errors.thumbnailUrl.message}
               </p>
             )}
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Pricing</label>
+           </div>
+           <div>
+             <label className="block text-sm font-medium mb-1">
+               Duration (minutes)
+             </label>
+             <Input
+               type="number"
+               placeholder="Duration in minutes"
+               {...form.register("duration", { valueAsNumber: true })}
+             />
+             {form.formState.errors.duration && (
+               <p className="text-red-400 text-sm">
+                 {form.formState.errors.duration.message}
+               </p>
+             )}
+           </div>
+           <div>
+             <label className="block text-sm font-medium mb-1">Pricing</label>
             <select
               {...form.register("pricing")}
               className="w-full px-3 py-2 bg-black/20 border border-red-500/20 rounded-md text-white"

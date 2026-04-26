@@ -17,6 +17,7 @@ import { Loader2, Clock, Calendar, User, Users } from "lucide-react";
 import { MoviePlayer } from "./MoviePlayer";
 import { authClient } from "@/lib/auth-client";
 import { LikeButton } from "./LikeButton";
+import { WatchListButton } from "./WatchListButton";
 import { ReviewForm } from "./ReviewForm";
 import { ReviewsSection } from "./ReviewsSection";
 
@@ -176,11 +177,17 @@ export function MovieDetailsClient({
             </div>
 
             {/* Stats */}
-            <div className="flex items-center gap-6 text-slate-400">
+            <div className="flex items-center gap-4 text-slate-400">
               <LikeButton
                 movieId={movie.id}
                 initialLikes={movie._count.likes}
-                isInitiallyLiked={movie.likes.some(like => like.userId === session?.user?.id)}
+                isInitiallyLiked={movie.likes.some(
+                  (like) => like.userId === session?.user?.id,
+                )}
+              />
+              <WatchListButton
+                movieId={movie.id}
+                initialIsInWatchList={false}
               />
               <div className="flex items-center gap-2">
                 <Users className="w-4 h-4" />
@@ -241,7 +248,7 @@ export function MovieDetailsClient({
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Review Form */}
             <div>
-              <ReviewForm movieId={movie.id} existingReviews={movie.reviews} />
+              <ReviewForm movieId={movie.id} />
             </div>
 
             {/* Reviews Display */}
@@ -249,7 +256,7 @@ export function MovieDetailsClient({
               <h2 className="text-2xl font-bold text-white mb-6">
                 Reviews ({movie._count.reviews})
               </h2>
-              <ReviewsSection reviews={movie.reviews} />
+               <ReviewsSection reviews={movie.reviews} movieId={movie.id} />
             </div>
           </div>
         </div>

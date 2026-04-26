@@ -2,16 +2,24 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Film, Star, Clock, Calendar } from "lucide-react";
+import { Film, Star, Clock, Calendar, X } from "lucide-react";
 import Image from "next/image";
 import { Movie } from "@/types/movie.types";
 import Link from "next/link";
+import { removeFromWatchListAction } from "@/services/watch-list.actions";
+import { toast } from "sonner";
 
 interface MovieCardProps {
   movie: Movie;
+  showRemoveFromWatchList?: boolean;
+  onRemoveFromWatchList?: (movieId: string) => void;
 }
 
-export function MovieCard({ movie }: MovieCardProps) {
+export function MovieCard({
+  movie,
+  showRemoveFromWatchList = false,
+  onRemoveFromWatchList,
+}: MovieCardProps) {
   const posterSrc = movie.thumbnailUrl;
   console.log(movie);
   return (
@@ -63,19 +71,38 @@ export function MovieCard({ movie }: MovieCardProps) {
           variant="outline"
           className="mb-3 border-slate-600 text-slate-400"
         >
-          {movie.categories[0]?.name}
+          {movie?.categories[0]?.name}
         </Badge>
 
         <p className="text-slate-300 text-sm line-clamp-2 mb-4">
-          {movie.description}
+          {movie?.description}
         </p>
 
-        <Button className="w-full bg-red-600 hover:bg-red-700" asChild>
-          <Link href={`/movies/${movie.id}`}>
-            <Film className="w-4 h-4 mr-2" />
-            Watch Now
-          </Link>
-        </Button>
+        <div className="space-y-2">
+          {showRemoveFromWatchList && (
+            <Button
+              className="w-full bg-red-600 hover:bg-red-700"
+              onClick={async () => {
+                const result = await removeFromWatchListAction(movie.id);
+                if (result.error) {
+                  toast.error(result.error);
+                } else {
+                  toast.success("Removed from watchlist");
+                  onRemoveFromWatchList?.(movie.id);
+                }
+              }}
+            >
+              <X className="w-4 h-4 mr-2" />
+              Remove from Watchlist
+            </Button>
+          )}
+          <Button className="w-full bg-red-600 hover:bg-red-700" asChild>
+            <Link href={`/movies/${movie.id}`}>
+              <Film className="w-4 h-4 mr-2" />
+              Watch Now
+            </Link>
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );

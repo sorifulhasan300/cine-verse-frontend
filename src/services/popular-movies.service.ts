@@ -19,10 +19,10 @@ export const popularMoviesService = {
   }> {
     try {
       const params = limit ? { limit } : {};
-      const response = await api.get("/movie/most-popular", { params });
+      const response = await api.get<PopularMovie[]>("/movie/most-popular", { params });
 
       // Handle different response structures
-      const movies = response.data?.data || response.data || [];
+      const movies = (response as any).data?.data || (response as any).data || [];
       return {
         data: Array.isArray(movies) ? movies : [],
         error: null,

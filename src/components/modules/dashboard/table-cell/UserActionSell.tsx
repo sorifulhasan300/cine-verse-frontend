@@ -1,4 +1,3 @@
-
 import {
   MoreHorizontal,
   UserCheck,
@@ -15,10 +14,10 @@ import {
 import { userManagementService } from "@/services/user-management.service";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { User, UserStatus } from "@/types/user.types";
+import { UserType, UserStatus } from "@/types/user.types";
 
 interface UserActionsCellProps {
-  user: User;
+  user: UserType;
   onUserAction: () => void;
 }
 export function UserActionsCell({ user, onUserAction }: UserActionsCellProps) {

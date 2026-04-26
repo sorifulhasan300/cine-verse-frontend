@@ -16,7 +16,7 @@ async function MainLayoutPage() {
       <TrendingMovies />
       <MovieCategories />
       <WhyChooseUs />
-      {user.plan != "FREE" ? (
+      {user?.plan != "FREE" ? (
         <></>
       ) : (
         <>

@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { Button } from "@/components/ui/button";
 import { Heart, Loader2 } from "lucide-react";
-import { useToggleLike } from "@/services/like.service";
 import { toast } from "sonner";
 import { useState } from "react";
+import { likeService } from "@/services/like.service";
 
 interface LikeButtonProps {
   movieId: string;
@@ -12,52 +13,58 @@ interface LikeButtonProps {
   isInitiallyLiked?: boolean;
 }
 
-export function LikeButton({ movieId, initialLikes, isInitiallyLiked = false }: LikeButtonProps) {
+export function LikeButton({
+  movieId,
+  initialLikes,
+  isInitiallyLiked = false,
+}: LikeButtonProps) {
   const [isLiked, setIsLiked] = useState(isInitiallyLiked);
   const [likesCount, setLikesCount] = useState(initialLikes);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const toggleLike = useToggleLike();
+  const handleToggleLike = async () => {
+    const previousIsLiked = isLiked;
+    const previousLikesCount = likesCount;
 
-  const handleToggleLike = () => {
-    toggleLike.mutate(
-      { movieId },
-      {
-        onSuccess: (data) => {
-          if (data.success) {
-            setIsLiked(data.data.liked);
-            setLikesCount(prev => data.data.liked ? prev + 1 : prev - 1);
-            toast.success(data.message);
-          } else {
-            toast.error(data.message || "Failed to toggle like");
-          }
-        },
-        onError: () => {
-          toast.error("Failed to toggle like");
-        },
+    setIsLiked(!previousIsLiked);
+    setLikesCount((prev) => (!previousIsLiked ? prev + 1 : prev - 1));
+
+    setIsLoading(true);
+
+    try {
+      const { success, message } = await likeService.toggleLike({ movieId });
+      if (success) {
+        setIsLiked(!previousIsLiked);
+        toast.success(message || "Action successful");
+      } else {
+        toast.error(message);
       }
-    );
+    } catch (error: any) {
+      setIsLiked(previousIsLiked);
+      setLikesCount(previousLikesCount);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <Button
       onClick={handleToggleLike}
-      disabled={toggleLike.isPending}
       variant="ghost"
       size="sm"
-      className={`flex items-center gap-2 ${
+      disabled={isLoading}
+      className={`flex items-center gap-2 transition-all duration-300 active:scale-90 ${
         isLiked
-          ? "text-red-400 hover:text-red-300"
-          : "text-slate-400 hover:text-slate-300"
+          ? "text-red-500 hover:text-red-600 hover:bg-red-500/10"
+          : "text-slate-400 hover:text-slate-300 hover:bg-slate-800"
       }`}
     >
-      {toggleLike.isPending ? (
-        <Loader2 className="w-4 h-4 animate-spin" />
-      ) : (
-        <Heart
-          className={`w-4 h-4 ${isLiked ? "fill-current" : ""}`}
-        />
-      )}
-      <span>{likesCount}</span>
+      <Heart
+        className={`w-4 h-4 transition-all ${
+          isLiked ? "fill-current scale-110" : "scale-100"
+        } ${isLoading ? "opacity-70" : "opacity-100"}`}
+      />
+      <span className="font-semibold">{likesCount}</span>
     </Button>
   );
 }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/httpClient";
 
@@ -7,10 +8,6 @@ export interface ToggleLikeRequest {
 
 export interface ToggleLikeResponse {
   success: boolean;
-  data: {
-    liked: boolean;
-    likeId?: string;
-  };
   message?: string;
 }
 
@@ -23,15 +20,17 @@ export const likeService = {
       }>("/likes/toggle-like", likeData);
       return {
         success: true,
-        data: response.data,
-        message: response.data.liked ? "Movie liked" : "Movie unliked",
+        message: response.message ? "Movie liked" : "Movie unliked",
       };
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Failed to toggle like";
+    } catch (error: any) {
+      const backendMessage = error.response?.data?.message;
+      const errorSourceMessage =
+        error.response?.data?.errorSources?.[0]?.message;
+
       return {
         success: false,
-        data: { liked: false },
-        message: errorMessage,
+        message:
+          backendMessage || errorSourceMessage || "Failed to toggle like",
       };
     }
   },

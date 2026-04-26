@@ -1,7 +1,7 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { User, UserStatus } from "@/types/user.types";
+import { UserStatus, UserType } from "@/types/user.types";
 import { Badge } from "@/components/ui/badge";
 import { UserActionsCell } from "../table-cell/UserActionSell";
 
@@ -11,7 +11,7 @@ interface UsersColumnsProps {
 
 export const getUsersColumns = ({
   onUserAction,
-}: UsersColumnsProps): ColumnDef<User>[] => [
+}: UsersColumnsProps): ColumnDef<UserType>[] => [
   {
     accessorKey: "name",
     header: "Name",

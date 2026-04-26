@@ -11,6 +11,8 @@ import {
 } from "@/services/popular-movies.service";
 import { MovieCard } from "@/components/ui/movie-card";
 import { toast } from "sonner";
+import Link from "next/link";
+import { Movie } from "@/types/movie.types";
 
 export function TrendingMovies() {
   const [movies, setMovies] = useState<PopularMovie[]>([]);
@@ -113,8 +115,26 @@ export function TrendingMovies() {
 
         {/* Movies Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          {movies.map((movie) => (
-            <MovieCard key={movie.id} movie={movie} />
+          {movies?.map((movie) => (
+            <MovieCard
+              key={movie.id}
+              movie={{
+                id: String(movie.id),
+                title: movie.title,
+                description: movie.description || '',
+                thumbnailUrl: movie.image || '',
+                releaseYear: movie.year.toString(),
+                director: '',
+                cast: '',
+                videoUrl: '',
+                duration: parseInt(movie.duration) || 0,
+                pricing: 'FREE',
+                createdAt: '',
+                updatedAt: '',
+                categories: [],
+                _count: { likes: 0, reviews: 0 },
+              } as Movie}
+            />
           ))}
         </div>
 
@@ -123,9 +143,9 @@ export function TrendingMovies() {
           <Button
             size="lg"
             variant="outline"
-            className="border-slate-600 text-slate-300 hover:bg-slate-800 hover:text-white px-8"
+            className="border-slate-600 text-black hover:bg-slate-400 cursor-po hover:text-white px-8"
           >
-            View All Trending Movies
+            <Link href={"/movies"}>View All Trending Movies</Link>
           </Button>
         </div>
       </div>

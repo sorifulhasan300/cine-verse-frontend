@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
-import { Film, Lock, Mail, User } from "lucide-react";
+import { Film, Lock, User } from "lucide-react";
 
 import { useForm } from "@tanstack/react-form";
 import { useRouter } from "next/navigation";
@@ -152,15 +152,26 @@ export function LoginForm({
             <Film className="w-4 h-4 mr-2" />
             Login
           </Button>
-          <FieldDescription className="text-center text-slate-300">
-            Don&apos;t have an account?{" "}
-            <Link
-              href="/register"
-              className="text-red-400 hover:text-red-300 underline"
-            >
-              Sign up
-            </Link>
-          </FieldDescription>
+          <div className="flex flex-col space-y-2">
+            <FieldDescription className="text-center text-slate-300">
+              Forgot your password?{" "}
+              <Link
+                href="/forgot-password"
+                className="text-red-400 hover:text-red-300 underline"
+              >
+                Reset it here
+              </Link>
+            </FieldDescription>
+            <FieldDescription className="text-center text-slate-300">
+              Don&apos;t have an account?{" "}
+              <Link
+                href="/register"
+                className="text-red-400 hover:text-red-300 underline"
+              >
+                Sign up
+              </Link>
+            </FieldDescription>
+          </div>
         </CardFooter>
       </Card>
     </div>

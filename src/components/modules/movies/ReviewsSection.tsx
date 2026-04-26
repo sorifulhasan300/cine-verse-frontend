@@ -2,18 +2,20 @@
 "use client";
 
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useCreateComment } from "@/services/comment.service";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Star, MessageCircle, Loader2, Send, X } from "lucide-react";
+import { Star, MessageCircle, Loader2, Send } from "lucide-react";
 import { Review } from "@/types/movie.types";
 import { toast } from "sonner";
 import { z } from "zod";
-import { commentService } from "@/services/comment.service";
 
 interface ReviewsSectionProps {
   reviews: Review[];
+  movieId: string;
 }
 
 const commentSchema = z.object({
@@ -23,12 +25,15 @@ const commentSchema = z.object({
     .max(500, "Comment must be less than 500 characters"),
 });
 
-export function ReviewsSection({ reviews }: ReviewsSectionProps) {
-  const [commentingOn, setCommentingOn] = useState<string | null>(null);
+export function ReviewsSection({ reviews, movieId }: ReviewsSectionProps) {
+  const [replyingTo, setReplyingTo] = useState<{ reviewId: string, targetId: string, type: 'review' | 'comment' } | null>(null);
   const [commentText, setCommentText] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const queryClient = useQueryClient();
+  const createCommentMutation = useCreateComment();
 
-  const handleCommentSubmit = async (reviewId: string) => {
+  const handleCommentSubmit = async () => {
+    if (!replyingTo) return;
+
     const validation = commentSchema.safeParse({ text: commentText.trim() });
 
     if (!validation.success) {
@@ -36,18 +41,18 @@ export function ReviewsSection({ reviews }: ReviewsSectionProps) {
       return;
     }
 
-    setIsSubmitting(true);
-
     try {
-      const response = await commentService.createComment({
-        reviewId,
+      const response = await createCommentMutation.mutateAsync({
+        reviewId: replyingTo.reviewId,
+        parentId: replyingTo.type === 'comment' ? replyingTo.targetId : undefined,
         text: validation.data.text,
       });
 
       if (response.success) {
         toast.success("Comment posted successfully!");
         setCommentText("");
-        setCommentingOn(null);
+        setReplyingTo(null);
+        queryClient.invalidateQueries({ queryKey: ["movie", movieId] });
       } else {
         toast.error(response.message || "Failed to post comment");
       }
@@ -58,8 +63,6 @@ export function ReviewsSection({ reviews }: ReviewsSectionProps) {
         "Something went wrong";
 
       toast.error(errorMessage);
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -118,24 +121,74 @@ export function ReviewsSection({ reviews }: ReviewsSectionProps) {
                   {review.comment}
                 </p>
 
+                {/* Comments */}
+                {review.comments && review.comments.length > 0 && (
+                  <div className="mt-4 space-y-3">
+                    {review.comments.map((comment) => (
+                      <div key={comment.id} className="ml-8 p-3 bg-slate-800/30 rounded-lg border-l-2 border-slate-600">
+                        <div className="flex gap-3">
+                          <Avatar className="w-8 h-8 border border-slate-600">
+                            <AvatarFallback className="bg-slate-700 text-slate-300 text-xs">
+                              {comment.user.name.charAt(0).toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between mb-1">
+                              <h5 className="font-medium text-slate-200 text-sm">{comment.user.name}</h5>
+                              <span className="text-[10px] text-slate-500">{new Date(comment.createdAt).toLocaleDateString()}</span>
+                            </div>
+                            <p className="text-slate-300 text-sm mb-2">{comment.text}</p>
+                            <button
+                              onClick={() => {
+                                setReplyingTo(replyingTo?.targetId === comment.id ? null : { reviewId: review.id, targetId: comment.id, type: 'comment' });
+                                setCommentText("");
+                              }}
+                              className="text-xs text-slate-400 hover:text-red-500"
+                            >
+                              Reply
+                            </button>
+                          </div>
+                        </div>
+                        {/* Nested replies if any */}
+                        {comment.replies && comment.replies.map((reply) => (
+                          <div key={reply.id} className="ml-8 mt-3 p-2 bg-slate-800/50 rounded border-l border-slate-500">
+                            <div className="flex gap-2">
+                              <Avatar className="w-6 h-6 border border-slate-600">
+                                <AvatarFallback className="bg-slate-700 text-slate-300 text-xs">
+                                  {reply.user.name.charAt(0).toUpperCase()}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="flex-1">
+                                <div className="flex items-center justify-between mb-1">
+                                  <h6 className="font-medium text-slate-200 text-xs">{reply.user.name}</h6>
+                                  <span className="text-[10px] text-slate-500">{new Date(reply.createdAt).toLocaleDateString()}</span>
+                                </div>
+                                <p className="text-slate-300 text-xs">{reply.text}</p>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
                 {/* Interaction Bar */}
                 <div className="flex items-center gap-4">
                   <button
                     onClick={() => {
-                      setCommentingOn(
-                        commentingOn === review.id ? null : review.id,
-                      );
+                      setReplyingTo(replyingTo?.targetId === review.id ? null : { reviewId: review.id, targetId: review.id, type: 'review' });
                       setCommentText("");
                     }}
                     className="flex items-center text-xs font-medium text-slate-400 hover:text-red-500 transition-colors"
                   >
                     <MessageCircle className="w-4 h-4 mr-1.5" />
-                    {commentingOn === review.id ? "Cancel" : "Reply"}
+                    {replyingTo?.targetId === review.id ? "Cancel" : "Reply"}
                   </button>
                 </div>
 
                 {/* Comment Input Area */}
-                {commentingOn === review.id && (
+                {replyingTo?.reviewId === review.id && (
                   <div className="mt-4 space-y-3 p-4 bg-slate-800/50 rounded-lg border border-slate-700/50 animate-in fade-in slide-in-from-top-2">
                     <Textarea
                       placeholder="Write your reply..."
@@ -149,11 +202,11 @@ export function ReviewsSection({ reviews }: ReviewsSectionProps) {
                       </p>
                       <Button
                         size="sm"
-                        onClick={() => handleCommentSubmit(review.id)}
-                        disabled={isSubmitting || commentText.length < 3}
+                        onClick={() => handleCommentSubmit()}
+                        disabled={createCommentMutation.isPending || commentText.length < 3}
                         className="bg-red-600 hover:bg-red-700 h-8 px-4"
                       >
-                        {isSubmitting ? (
+                        {createCommentMutation.isPending ? (
                           <Loader2 className="w-3 h-3 animate-spin" />
                         ) : (
                           <Send className="w-3 h-3 mr-2" />

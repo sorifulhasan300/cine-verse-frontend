@@ -45,6 +45,7 @@ export const movieValidationSchema = z.object({
   cast: z.string().optional(),
   videoUrl: z.string().url("Invalid video URL"),
   thumbnailUrl: z.string().url("Invalid thumbnail URL"),
+  duration: z.number().min(1, "Duration must be at least 1 minute"),
   pricing: z.enum(["FREE", "PREMIUM"], {
     message: "Pricing must be either 'FREE' or 'PREMIUM'",
   }),

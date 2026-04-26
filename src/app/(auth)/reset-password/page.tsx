@@ -1,6 +1,6 @@
-import { ForgotPasswordForm } from "@/components/modules/auth/forgot-password-form";
+import { ResetPasswordForm } from "@/components/modules/auth/reset-password-form";
 
-export default function ForgotPasswordPage() {
+export default function ResetPasswordPage() {
   return (
     <div className="min-h-screen bg-slate-950 text-white relative overflow-hidden">
       {/* Background Effects */}
@@ -10,7 +10,7 @@ export default function ForgotPasswordPage() {
 
       {/* Content */}
       <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
-        <ForgotPasswordForm />
+        <ResetPasswordForm />
       </div>
     </div>
   );

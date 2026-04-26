@@ -1,6 +1,6 @@
 import { Button as ButtonPrimitive } from "@base-ui/react/button"
-import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
+import { Slot } from "@radix-ui/react-slot"
 
 import { cn } from "@/lib/utils"
 
@@ -47,11 +47,13 @@ function Button({
   ...props
 }: ButtonPrimitive.Props & VariantProps<typeof buttonVariants> & { asChild?: boolean }) {
   if (asChild) {
+    const { style, ...slotProps } = props
     return (
       <Slot
         data-slot="button"
         className={cn(buttonVariants({ variant, size, className }))}
-        {...props}
+        style={typeof style === 'function' ? undefined : style}
+        {...slotProps}
       />
     )
   }

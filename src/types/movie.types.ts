@@ -18,6 +18,7 @@ export interface Review {
     email: string;
   };
   createdAt: string;
+  comments?: Comment[];
 }
 
 export interface Like {

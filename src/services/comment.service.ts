@@ -37,3 +37,17 @@ export const commentService = {
     }
   },
 };
+
+export const useCreateComment = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: commentService.createComment,
+    onSuccess: (data, variables) => {
+      if (data.success) {
+        // Note: We need movieId to invalidate the correct query
+        // This will be handled in the component where we have access to movieId
+      }
+    },
+  });
+};

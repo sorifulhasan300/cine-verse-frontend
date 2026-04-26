@@ -22,8 +22,8 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { authService } from "@/services/auth.service";
 import { User, Edit3, Save, X, Shield } from "lucide-react";
+import { authClient } from "@/lib/auth-client";
 
 const updateProfileSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -59,7 +59,7 @@ function ProfileCard({ user, variant = "user" }: ProfileCardProps) {
     onSubmit: async ({ value }) => {
       const toastId = toast.loading("Updating profile...");
       try {
-        const response = await authService.updateUserProfile({
+        const response = await authClient.updateUser({
           name: value.name,
           image: value.image || undefined,
         });

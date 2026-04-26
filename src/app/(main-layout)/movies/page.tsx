@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { Badge } from "@/components/ui/badge";
 import { MoviesClient } from "@/components/modules/movies/MoviesClient";
 import { movieService } from "@/services/movie.service";
@@ -6,6 +6,35 @@ import { QueryClient, dehydrate } from "@tanstack/react-query";
 
 interface MoviesPageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}
+
+function MoviesLoading() {
+  return (
+    <div className="min-h-screen bg-slate-950">
+      <div className="bg-slate-900 border-b border-slate-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center">
+            <Badge
+              variant="secondary"
+              className="mb-4 bg-red-600/10 text-red-400 border-red-600/20"
+            >
+              🎬 Movie Collection
+            </Badge>
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+              All Movies
+            </h1>
+            <p className="text-xl text-slate-400 max-w-2xl mx-auto">
+              Explore our complete collection of movies. From blockbusters to
+              indie gems, find your next favorite film.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div className="text-center py-12">
+        <p className="text-slate-400 text-lg">Loading movies...</p>
+      </div>
+    </div>
+  );
 }
 
 export default async function AllMoviesPage({ searchParams }: MoviesPageProps) {
@@ -73,7 +102,9 @@ export default async function AllMoviesPage({ searchParams }: MoviesPageProps) {
         </div>
       </div>
 
-      <MoviesClient dehydratedState={dehydratedState} />
+      <Suspense fallback={<MoviesLoading />}>
+        <MoviesClient dehydratedState={dehydratedState} />
+      </Suspense>
     </div>
   );
 }

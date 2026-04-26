@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState } from "react";
@@ -44,7 +45,7 @@ export function ReviewForm({ movieId }: ReviewFormProps) {
     setIsSubmitting(true);
 
     try {
-      const { success, message } = await reviewService.createReview({
+      const { success, data, message } = await reviewService.createReview({
         movieId,
         rating: validation.data.rating,
         text: validation.data.text,
@@ -55,11 +56,16 @@ export function ReviewForm({ movieId }: ReviewFormProps) {
         setRating(0);
         setText("");
       } else {
+        // ব্যাকএন্ড থেকে আসা কাস্টম এরর মেসেজ
         toast.error(message || "Something went wrong");
       }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      toast.error("Something went wrong. Please try again.");
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to connect to server";
+
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }

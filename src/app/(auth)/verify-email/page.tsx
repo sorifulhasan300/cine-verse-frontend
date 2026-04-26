@@ -1,9 +1,6 @@
 import VerifyOtpForm from "@/components/modules/auth/verify-otp-form";
-import { authClient } from "@/lib/auth-client";
 
 export default async function VerifyEmailPage() {
-  const session = await authClient.getSession();
-  const email = session.data?.user?.email;
   return (
     <div className="min-h-screen bg-slate-950 text-white relative overflow-hidden">
       {/* Background Effects */}
@@ -17,7 +14,7 @@ export default async function VerifyEmailPage() {
           <h1 className="text-2xl font-bold mb-4 text-center text-white">
             Verify Email
           </h1>
-          <VerifyOtpForm email={email} />
+          <VerifyOtpForm />
         </div>
       </div>
     </div>

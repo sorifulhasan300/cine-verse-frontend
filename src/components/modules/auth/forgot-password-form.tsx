@@ -9,42 +9,49 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Field, FieldError, FieldGroup } from "@/components/ui/field";
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Film, Mail } from "lucide-react";
+
 import { useForm } from "@tanstack/react-form";
 import { toast } from "sonner";
-import { verifyOtpSchema } from "@/zod/auth.validation";
-import { ShieldCheck, RefreshCw } from "lucide-react";
+import z from "zod";
 import { authService } from "@/services/auth.service";
 
-export function VerifyOtpForm({
-  className,
-  email,
-  ...props
-}: React.ComponentProps<"div"> & { email?: string }) {
-  const router = useRouter();
+const formSchema = z.object({
+  email: z.string().email("Invalid email address"),
+});
 
+export function ForgotPasswordForm({
+  className,
+  ...props
+}: React.ComponentProps<"div">) {
+  const router = useRouter();
   const form = useForm({
     defaultValues: {
-      otp: "",
-      email: email || "",
+      email: "",
     },
     validators: {
-      onSubmit: verifyOtpSchema,
+      onSubmit: formSchema,
     },
     onSubmit: async ({ value }) => {
-      const toastId = toast.loading("Verifying email...");
+      const toastId = toast.loading("Sending reset request...");
       try {
-        await authService.verifyEmail(value.otp, value.email);
-        localStorage.removeItem("pendingVerificationEmail");
-        toast.success("Email verified successfully", { id: toastId });
-        router.push("/login");
-      } catch (error) {
-        toast.error(
-          error instanceof Error ? error.message : "Verification failed",
-          { id: toastId },
-        );
+        await authService.requestPasswordReset(value.email);
+        toast.success("Reset link sent to your email", { id: toastId });
+        router.push("/reset-password");
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (error: any) {
+        const errorMessage =
+          error.response?.data?.message || "Something went wrong";
+        toast.error(errorMessage, { id: toastId });
       }
     },
   });
@@ -54,62 +61,43 @@ export function VerifyOtpForm({
       <Card className="max-w-4xl w-full border border-red-500 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-2xl">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold text-white flex items-center justify-center gap-2">
-            <ShieldCheck className="w-6 h-6 text-red-500" />
-            Verify Your Email
+            <Film className="w-6 h-6 text-red-500" />
+            Forgot Password
           </CardTitle>
           <CardDescription className="text-slate-300">
-            Enter the 6-digit OTP sent to your email
+            Enter your email to receive a password reset OTP
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form
-            id="verify-otp-form"
+            id="forgot-password-form"
             onSubmit={(e) => {
               e.preventDefault();
               form.handleSubmit();
             }}
           >
             <FieldGroup className="space-y-4">
-              <form.Field name="otp">
-                {(field) => {
-                  const isInvalid =
-                    field.state.meta.isTouched && !field.state.meta.isValid;
-                  return (
-                    <Field data-invalid={isInvalid}>
-                      <div className="relative">
-                        <Input
-                          id={field.name}
-                          name={field.name}
-                          value={field.state.value}
-                          onBlur={field.handleBlur}
-                          onChange={(e) => field.handleChange(e.target.value)}
-                          placeholder="Enter 6-digit OTP"
-                          maxLength={6}
-                          className="text-center text-lg bg-slate-800 border-slate-600 text-white placeholder-slate-400"
-                        />
-                      </div>
-                      {isInvalid && (
-                        <FieldError errors={field.state.meta.errors} />
-                      )}
-                    </Field>
-                  );
-                }}
-              </form.Field>
               <form.Field name="email">
                 {(field) => {
                   const isInvalid =
                     field.state.meta.isTouched && !field.state.meta.isValid;
                   return (
                     <Field data-invalid={isInvalid}>
+                      <FieldLabel htmlFor={field.name} className="text-white">
+                        Email
+                      </FieldLabel>
                       <div className="relative">
+                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
+
                         <Input
                           id={field.name}
                           name={field.name}
                           value={field.state.value}
                           onBlur={field.handleBlur}
                           onChange={(e) => field.handleChange(e.target.value)}
-                          placeholder="Enter Your Email"
-                          className="text-center text-lg bg-slate-800 border-slate-600 text-white placeholder-slate-400"
+                          placeholder="Enter your email"
+                          autoComplete="email"
+                          className="pl-10 bg-slate-800 border-slate-600 text-white placeholder-slate-400"
                         />
                       </div>
                       {isInvalid && (
@@ -124,17 +112,23 @@ export function VerifyOtpForm({
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">
           <Button
-            form="verify-otp-form"
+            form="forgot-password-form"
             type="submit"
             className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
           >
-            <ShieldCheck className="w-4 h-4 mr-2" />
-            Verify Email
+            <Mail className="w-4 h-4 mr-2" />
+            Send Reset OTP
           </Button>
+          <div className="text-center text-slate-300">
+            <Link
+              href="/login"
+              className="text-red-400 hover:text-red-300 underline"
+            >
+              Back to Login
+            </Link>
+          </div>
         </CardFooter>
       </Card>
     </div>
   );
 }
-
-export default VerifyOtpForm;
