@@ -3,6 +3,7 @@ import { getSessionFromRequest } from "./lib/auth-session";
 
 const baseURL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL!;
 
 async function getMoviePricing(
   id: string,
@@ -12,6 +13,7 @@ async function getMoviePricing(
     const res = await fetch(`${baseURL}/movie/${id}`, {
       headers: {
         cookie,
+        origin: APP_URL,
       },
     });
     if (!res.ok) return null;
@@ -26,6 +28,10 @@ export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const session = await getSessionFromRequest(request);
+
+  // session response এ Set-Cookie থাকলে সেটা forward করতে হবে
+  // তাই final response এ cookie propagate করার জন্য
+  // NextResponse.next() এ headers merge করবো
 
   if (
     session &&
@@ -50,10 +56,8 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL("/user", request.url));
   }
 
-  // Check for premium movie access
   const movieMatch = pathname.match(/^\/movies\/([^\/]+)$/);
   if (movieMatch && movieMatch[1] !== "page" && !pathname.includes("/edit")) {
-    // exclude list page and edit
     const movieId = movieMatch[1];
     const userPlan = session?.user?.plan || "FREE";
     if (userPlan === "FREE" || !userPlan) {
