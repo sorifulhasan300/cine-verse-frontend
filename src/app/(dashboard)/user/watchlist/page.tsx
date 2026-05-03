@@ -2,6 +2,8 @@ import React from "react";
 import { WatchListGrid } from "@/components/modules/dashboard/user/WatchList";
 import { watchListService } from "../../../../services/watch-list.service";
 
+export const dynamic = 'force-dynamic';
+
 async function WatchListPage() {
   const { data: watchList, error } = await watchListService.getMyWatchList();
   console.log(watchList);

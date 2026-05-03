@@ -10,6 +10,7 @@ export async function getSessionFromRequest(request: NextRequest) {
       headers: {
         cookie: request.headers.get("cookie") ?? "",
       },
+      credentials: "include",
     });
 
     if (!response.ok) return null;
@@ -32,6 +33,7 @@ export async function getCurrentUser() {
     const response = await fetch(`${BACKEND_URL}/api/auth/get-session`, {
       headers: { cookie },
       cache: "no-store",
+      credentials: "include",
     });
 
     if (!response.ok) return null;

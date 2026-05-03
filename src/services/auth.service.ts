@@ -15,6 +15,7 @@ export const authService = {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, otp }),
+        credentials: "include",
       });
 
       const data = await response.json();
@@ -47,6 +48,7 @@ export const authService = {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email }),
+        credentials: "include",
       });
 
       const data = await response.json();
@@ -77,6 +79,7 @@ export const authService = {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, otp, newPassword }),
+        credentials: "include",
       });
 
       const data = await response.json();

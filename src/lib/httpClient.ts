@@ -7,8 +7,7 @@ export interface ApiResponse<T = any> {
   message?: string;
 }
 
-const baseURL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
+const baseURL = process.env.NEXT_PUBLIC_API_URL;
 
 const axiosInstance: AxiosInstance = axios.create({
   baseURL,
@@ -16,6 +15,18 @@ const axiosInstance: AxiosInstance = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
+});
+
+axiosInstance.interceptors.request.use((config) => {
+  if (typeof window !== "undefined") {
+    const cookieMatch = document.cookie.match(
+      /better-auth\.session_token=([^;]+)/,
+    );
+    if (cookieMatch) {
+      config.headers.Authorization = `Bearer ${cookieMatch[1]}`;
+    }
+  }
+  return config;
 });
 
 axiosInstance.interceptors.response.use(

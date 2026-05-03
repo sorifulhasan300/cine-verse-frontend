@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSessionFromRequest } from "./lib/auth-session";
 
-const baseURL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
+const baseURL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
 
-async function getMoviePricing(id: string, cookie: string): Promise<string | null> {
+async function getMoviePricing(
+  id: string,
+  cookie: string,
+): Promise<string | null> {
   try {
     const res = await fetch(`${baseURL}/movie/${id}`, {
       headers: {
@@ -48,11 +52,15 @@ export async function proxy(request: NextRequest) {
 
   // Check for premium movie access
   const movieMatch = pathname.match(/^\/movies\/([^\/]+)$/);
-  if (movieMatch && movieMatch[1] !== 'page' && !pathname.includes('/edit')) { // exclude list page and edit
+  if (movieMatch && movieMatch[1] !== "page" && !pathname.includes("/edit")) {
+    // exclude list page and edit
     const movieId = movieMatch[1];
     const userPlan = session?.user?.plan || "FREE";
-    if (userPlan === "FREE") {
-      const pricing = await getMoviePricing(movieId, request.headers.get('cookie') || '');
+    if (userPlan === "FREE" || !userPlan) {
+      const pricing = await getMoviePricing(
+        movieId,
+        request.headers.get("cookie") || "",
+      );
       if (pricing === "PREMIUM") {
         return NextResponse.redirect(new URL("/pricing", request.url));
       }
@@ -63,5 +71,11 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/user/:path*", "/admin/:path*", "/login", "/register", "/movies/:path*"],
+  matcher: [
+    "/user/:path*",
+    "/admin/:path*",
+    "/login",
+    "/register",
+    "/movies/:path*",
+  ],
 };

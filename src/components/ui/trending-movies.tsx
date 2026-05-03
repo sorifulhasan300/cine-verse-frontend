@@ -6,14 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Film } from "lucide-react";
-import {
-  popularMoviesService,
-  PopularMovie,
-} from "@/services/popular-movies.service";
+import { popularMoviesService } from "@/services/popular-movies.service";
 import { MovieCard } from "@/components/ui/movie-card";
 import { toast } from "sonner";
 import Link from "next/link";
-import { Movie } from "@/types/movie.types";
+import { PopularMovie } from "@/types/role.types";
 
 export function TrendingMovies() {
   const [movies, setMovies] = useState<PopularMovie[]>([]);

@@ -23,6 +23,7 @@ export const categoryManagementService = {
         error: null,
       };
     } catch (error: any) {
+      console.error("Error fetching categories:", error);
       return {
         data: null,
         pagination: null,
@@ -45,6 +46,7 @@ export const categoryManagementService = {
         error: null,
       };
     } catch (error: any) {
+      console.error("Error creating category:", error);
       return {
         data: null,
         error: error.response?.data?.message || "Failed to create category",
@@ -66,6 +68,7 @@ export const categoryManagementService = {
         error: null,
       };
     } catch (error: any) {
+      console.error("Error updating category:", error);
       return {
         data: null,
         error: error.response?.data?.message || "Failed to update category",
@@ -84,6 +87,7 @@ export const categoryManagementService = {
         error: null,
       };
     } catch (error: any) {
+      console.error("Error deleting category:", error);
       return {
         success: false,
         error: error.response?.data?.message || "Failed to delete category",
