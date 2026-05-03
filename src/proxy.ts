@@ -24,36 +24,43 @@ async function getMoviePricing(
   }
 }
 
+function stripSetCookie(response: NextResponse): NextResponse {
+  response.headers.delete("set-cookie");
+  return response;
+}
+
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const session = await getSessionFromRequest(request);
-
-  // session response এ Set-Cookie থাকলে সেটা forward করতে হবে
-  // তাই final response এ cookie propagate করার জন্য
-  // NextResponse.next() এ headers merge করবো
 
   if (
     session &&
     (pathname.startsWith("/login") || pathname.startsWith("/register"))
   ) {
     const targetPath = session.user.role === "ADMIN" ? "/admin" : "/user";
-    return NextResponse.redirect(new URL(targetPath, request.url));
+    return stripSetCookie(
+      NextResponse.redirect(new URL(targetPath, request.url)),
+    );
   }
 
   if (
     !session &&
     (pathname.startsWith("/user") || pathname.startsWith("/admin"))
   ) {
-    return NextResponse.redirect(new URL("/login", request.url));
+    return stripSetCookie(
+      NextResponse.redirect(new URL("/login", request.url)),
+    );
   }
 
   if (pathname.startsWith("/user") && session?.user.role === "ADMIN") {
-    return NextResponse.redirect(new URL("/admin", request.url));
+    return stripSetCookie(
+      NextResponse.redirect(new URL("/admin", request.url)),
+    );
   }
 
   if (pathname.startsWith("/admin") && session?.user.role !== "ADMIN") {
-    return NextResponse.redirect(new URL("/user", request.url));
+    return stripSetCookie(NextResponse.redirect(new URL("/user", request.url)));
   }
 
   const movieMatch = pathname.match(/^\/movies\/([^\/]+)$/);
@@ -66,12 +73,14 @@ export async function proxy(request: NextRequest) {
         request.headers.get("cookie") || "",
       );
       if (pricing === "PREMIUM") {
-        return NextResponse.redirect(new URL("/pricing", request.url));
+        return stripSetCookie(
+          NextResponse.redirect(new URL("/pricing", request.url)),
+        );
       }
     }
   }
 
-  return NextResponse.next();
+  return stripSetCookie(NextResponse.next());
 }
 
 export const config = {

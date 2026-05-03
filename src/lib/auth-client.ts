@@ -2,8 +2,10 @@ import { createAuthClient } from "better-auth/react";
 import { env } from "./config";
 
 export const authClient = createAuthClient({
-  baseURL: env.NEXT_PUBLIC_BACKEND_URL,
-
+  baseURL:
+    typeof window !== "undefined"
+      ? `${window.location.origin}/api/auth`
+      : "https://cine-verse-frontend-gamma.vercel.app/api/auth",
   plugins: [
     {
       id: "next-cookies-request",

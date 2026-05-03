@@ -2,23 +2,29 @@ import { NextRequest } from "next/server";
 import { env } from "./config";
 import { session } from "@/types/session.types";
 
-const BACKEND_URL = env.NEXT_PUBLIC_BACKEND_URL;
-const APP_URL = env.NEXT_PUBLIC_APP_URL;
+const FRONTEND_URL = env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
-export async function getSessionFromRequest(request: NextRequest) {
+const SESSION_COOKIE_NAMES = [
+  "__Secure-better-auth.session_token",
+  "better-auth.session_token",
+];
+
+export async function getSessionFromRequest(
+  request: NextRequest,
+): Promise<session | null> {
   try {
-    // cookie না থাকলে আগেই return — unnecessary call বন্ধ করো
     const cookieHeader = request.headers.get("cookie") ?? "";
-    if (!cookieHeader.includes("better-auth.session_token")) {
-      return null;
-    }
 
-    const response = await fetch(`${BACKEND_URL}/api/auth/get-session`, {
+    const hasSessionCookie = SESSION_COOKIE_NAMES.some((name) =>
+      cookieHeader.includes(name),
+    );
+    if (!hasSessionCookie) return null;
+
+    const response = await fetch(`${FRONTEND_URL}/api/auth/get-session`, {
       headers: {
         cookie: cookieHeader,
-        origin: APP_URL,
+        origin: FRONTEND_URL,
       },
-      // cache করো — একই request এ বারবার call হলে session clear হওয়ার chance বাড়ে
       cache: "no-store",
     });
 
@@ -27,24 +33,27 @@ export async function getSessionFromRequest(request: NextRequest) {
     const data = await response.json();
     if (!data || !data.user) return null;
 
-    return data;
+    return data as session;
   } catch {
     return null;
   }
 }
 
-export async function getCurrentUser() {
+export async function getCurrentUser(): Promise<session | null> {
   try {
     const { headers } = await import("next/headers");
     const headersList = await headers();
     const cookie = headersList.get("cookie") ?? "";
 
-    if (!cookie.includes("better-auth.session_token")) return null;
+    const hasSessionCookie = SESSION_COOKIE_NAMES.some((name) =>
+      cookie.includes(name),
+    );
+    if (!hasSessionCookie) return null;
 
-    const response = await fetch(`${BACKEND_URL}/api/auth/get-session`, {
+    const response = await fetch(`${FRONTEND_URL}/api/auth/get-session`, {
       headers: {
         cookie,
-        origin: APP_URL,
+        origin: FRONTEND_URL,
       },
       cache: "no-store",
     });

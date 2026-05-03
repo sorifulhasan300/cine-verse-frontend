@@ -9,9 +9,17 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "http",
-        hostname: "**", 
+        hostname: "**",
       },
     ],
+  },
+  async rewrites() {
+    return [
+      {
+        source: "/api/auth/:path*",
+        destination: `https://cine-verse-backend-pro.vercel.app/api/auth/:path*`,
+      },
+    ];
   },
 };
 
