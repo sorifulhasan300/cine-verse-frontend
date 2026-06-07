@@ -1,7 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { api } from "@/lib/httpClient";
-import { movieValidationSchema } from "@/zod/movie.validation";
-import z from "zod";
 import { MovieDetails } from "@/types/movie.types";
 
 export interface MovieResponse {

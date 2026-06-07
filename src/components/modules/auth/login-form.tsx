@@ -19,16 +19,12 @@ import {
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { Film, Lock, User } from "lucide-react";
-
 import { useForm } from "@tanstack/react-form";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
-import z from "zod";
-const formSchema = z.object({
-  password: z.string().min(5, "password must be at least 5 characters."),
-  email: z.string().email("Invalid email address"),
-});
+import { loginSchema } from "@/zod/auth.validation";
+
 export function LoginForm({
   className,
   ...props
@@ -40,7 +36,7 @@ export function LoginForm({
       password: "",
     },
     validators: {
-      onSubmit: formSchema,
+      onSubmit: loginSchema,
     },
     onSubmit: async ({ value }) => {
       const toastId = toast.loading("login...");
@@ -112,7 +108,6 @@ export function LoginForm({
                 {(field) => {
                   const isInvalid =
                     field.state.meta.isTouched && !field.state.meta.isValid;
-
                   return (
                     <Field data-invalid={isInvalid}>
                       <FieldLabel htmlFor={field.name} className="text-white">
@@ -152,6 +147,30 @@ export function LoginForm({
             <Film className="w-4 h-4 mr-2" />
             Login
           </Button>
+          <div className="flex flex-col space-y-2">
+            <Button
+              variant="outline"
+              type="button"
+              onClick={() => {
+                form.setFieldValue("email", "sorifullhasan310@gmail.com");
+                form.setFieldValue("password", "sorifullhasan310@gmail.com");
+              }}
+              className="text-sm border-slate-600 text-black hover:bg-slate-700"
+            >
+              Demo User
+            </Button>
+            <Button
+              variant="outline"
+              type="button"
+              onClick={() => {
+                form.setFieldValue("email", "sorifullhasan300@gmail.com");
+                form.setFieldValue("password", "sorifullhasan300@gmail.com");
+              }}
+              className="text-sm border-slate-600 text-black hover:bg-slate-700"
+            >
+              Demo Admin
+            </Button>
+          </div>
           <div className="flex flex-col space-y-2">
             <FieldDescription className="text-center text-slate-300">
               Forgot your password?{" "}

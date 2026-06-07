@@ -10,7 +10,7 @@ export default function RegisterPage() {
 
       {/* Content */}
       <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
-        <RegisterForm />
+        <RegisterForm className="text-green-500" id="new-form-id" />
       </div>
     </div>
   );

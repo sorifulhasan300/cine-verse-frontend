@@ -25,19 +25,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
 import { Eye, EyeOff, Film, User, Mail, Lock } from "lucide-react";
-import z from "zod";
-
-const formSchema = z
-  .object({
-    name: z.string().min(2, "Name must be at least 2 characters"),
-    email: z.string().email("Invalid email address"),
-    password: z.string().min(8, "Password must be at least 8 characters"),
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ["confirmPassword"],
-  });
+import { registerSchema } from "@/zod/auth.validation";
 
 export function RegisterForm({
   className,
@@ -46,7 +34,6 @@ export function RegisterForm({
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const router = useRouter();
-
   const form = useForm({
     defaultValues: {
       name: "",
@@ -55,13 +42,13 @@ export function RegisterForm({
       confirmPassword: "",
     },
     validators: {
-      onSubmit: formSchema,
+      onSubmit: registerSchema,
     },
     onSubmit: async ({ value }) => {
       const toastId = toast.loading("Creating account...");
       try {
         const { confirmPassword, ...signUpData } = value;
-        const { data, error } = await authClient.signUp.email(signUpData);
+        const { error } = await authClient.signUp.email(signUpData);
         if (error) {
           toast.error(error.message, { id: toastId });
           return;
@@ -74,15 +61,16 @@ export function RegisterForm({
       }
     },
   });
+
   return (
-    <div className={cn("w-full max-w-md mx-auto", className)} {...props}>
-      <Card className="max-w-4xl w-full border border-red-500 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-2xl">
+    <div className={cn("w-full max-w-md mx-auto ", className)} {...props}>
+      <Card className="max-w-4xl w-full border  border-red-500 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-slate-700 shadow-2xl">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold text-white flex items-center justify-center gap-2">
             <Film className="w-6 h-6 text-red-500" />
             Join CineVerse
           </CardTitle>
-          <CardDescription className="text-slate-300">
+          <CardDescription className="text-slate-300 border-b border-red-700 pb-4">
             Create your account to unlock the cinematic experience
           </CardDescription>
         </CardHeader>
@@ -249,6 +237,40 @@ export function RegisterForm({
             <Film className="w-4 h-4 mr-2" />
             Get Started
           </Button>
+          <div className="flex flex-col space-y-2">
+            <Button
+              variant="outline"
+              type="button"
+              onClick={() => {
+                form.setFieldValue("name", "Demo User");
+                form.setFieldValue("email", "sorifullhasan310@gmail.com");
+                form.setFieldValue("password", "sorifullhasan310@gmail.com");
+                form.setFieldValue(
+                  "confirmPassword",
+                  "sorifullhasan310@gmail.com",
+                );
+              }}
+              className="text-sm border-slate-600 text-black hover:bg-slate-700"
+            >
+              Demo User
+            </Button>
+            <Button
+              variant="outline"
+              type="button"
+              onClick={() => {
+                form.setFieldValue("name", "Demo Admin");
+                form.setFieldValue("email", "sorifullhasan300@gmail.com");
+                form.setFieldValue("password", "sorifullhasan300@gmail.com");
+                form.setFieldValue(
+                  "confirmPassword",
+                  "sorifullhasan300@gmail.com",
+                );
+              }}
+              className="text-sm border-slate-600 text-black hover:bg-slate-700"
+            >
+              Demo Admin
+            </Button>
+          </div>
           <FieldDescription className="text-center text-slate-300">
             Already a member?{" "}
             <Link

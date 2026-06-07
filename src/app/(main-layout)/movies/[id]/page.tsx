@@ -24,7 +24,6 @@ export default async function MovieDetailsPage({
   }
 
   const { id } = resolvedParams;
-  console.log("id:", id);
   const queryClient = new QueryClient();
   const queryKey = ["movie", id];
 
