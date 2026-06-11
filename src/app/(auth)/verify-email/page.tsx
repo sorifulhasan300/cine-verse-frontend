@@ -11,9 +11,6 @@ export default async function VerifyEmailPage() {
       {/* Content */}
       <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
         <div className="w-full max-w-md mx-auto">
-          <h1 className="text-2xl font-bold mb-4 text-center text-white">
-            Verify Email
-          </h1>
           <VerifyOtpForm />
         </div>
       </div>
