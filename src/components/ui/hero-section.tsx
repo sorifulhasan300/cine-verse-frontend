@@ -16,9 +16,9 @@ export function HeroSection() {
           playsInline
           className="w-full h-full object-cover scale-[1.02] filter brightness-[0.90] contrast-[1.1]"
         >
-          <source src="/hero-video.mp4" type="video/mp4" />
+          {/* <source src="/hero-video.mp4" type="video/mp4" /> */}
           {/* Fallback */}
-          {/* <source src="https://assets.mixkit.co/videos/preview/mixkit-clapperboard-and-film-strips-under-lights-42220-large.mp4" type="video/mp4" /> */}
+          <source src="https://i.imgur.com/x4yVts7.mp4" type="video/mp4" />
         </video>
 
         {/* Cinematic Layer 1: Dark Slate Gradient to preserve contrast for text */}
