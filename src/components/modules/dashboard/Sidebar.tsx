@@ -115,20 +115,20 @@ export function Sidebar({ onClose, isInDrawer = false }: SidebarProps) {
       {/* --- BOTTOM SECTION (User Profile) --- */}
       <div className="p-4 mt-auto">
         <div className="bg-white/[0.03] border border-white/5 rounded-2xl p-4 shadow-2xl">
-           <div className="flex items-center gap-3 mb-4">
-             <div className="relative">
-               <Avatar className="h-10 w-10 border-2 border-red-600/20">
-                 <AvatarImage src={user.image || ""} />
-                 <AvatarFallback className="bg-red-950 text-red-500 font-bold">
-                   {user.email.charAt(0).toUpperCase()}
-                 </AvatarFallback>
-               </Avatar>
-               {isPremium && (
-                 <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-500 rounded-full flex items-center justify-center border border-slate-950">
-                   <Crown className="w-2.5 h-2.5 text-slate-950" />
-                 </div>
-               )}
-             </div>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="relative">
+              <Avatar className="h-10 w-10 border-2 border-red-600/20">
+                <AvatarImage src={user.image || ""} />
+                <AvatarFallback className="bg-red-950 text-red-500 font-bold">
+                  {user.email.charAt(0).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              {isPremium && (
+                <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-500 rounded-full flex items-center justify-center border border-slate-950">
+                  <Crown className="w-2.5 h-2.5 text-slate-950" />
+                </div>
+              )}
+            </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-bold text-white truncate leading-none mb-1">
                 {user.name || "Cinema Fan"}
@@ -172,11 +172,11 @@ export function Sidebar({ onClose, isInDrawer = false }: SidebarProps) {
             <Button
               variant="ghost"
               size="sm"
-              className="text-slate-400 hover:text-red-500 hover:bg-red-500/10 h-9 rounded-lg"
+              className="text-slate-400 cursor-pointer hover:text-red-500 hover:bg-red-500/10 h-9 rounded-lg"
               onClick={() => authClient.signOut()}
             >
               <LogOut className="w-4 h-4 mr-2" />
-              Exit
+              Logout
             </Button>
           </div>
         </div>

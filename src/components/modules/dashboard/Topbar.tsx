@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { authClient } from "@/lib/auth-client";
 import { LogOut, Menu, User } from "lucide-react";
 import { toast } from "sonner";
+import Link from "next/link";
 
 interface User {
   id: string;
@@ -84,11 +85,12 @@ export function Topbar({ onMenuClick }: TopbarProps) {
             <Button
               variant="ghost"
               size="sm"
-              onClick={handleLogout}
               className="text-slate-400 hover:text-white hover:bg-slate-800"
             >
-              <LogOut className="w-4 h-4 mr-2" />
-              <span className="hidden sm:inline">Logout</span>
+              <Link href="/" className="flex items-center">
+                <LogOut className="w-4 h-4 mr-2" />
+                <span className="hidden sm:inline">Exit</span>
+              </Link>
             </Button>
           </>
         ) : null}
