@@ -21,7 +21,6 @@ export function MovieCard({
   onRemoveFromWatchList,
 }: MovieCardProps) {
   const posterSrc = movie.thumbnailUrl;
-  console.log(movie);
   return (
     <Card className="bg-slate-900 border-slate-700 hover:border-slate-600 transition-all duration-300 group">
       <CardHeader className="p-0">

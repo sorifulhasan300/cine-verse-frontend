@@ -77,7 +77,6 @@ export function CategoryAdmin() {
   } = useQuery({
     queryKey: ["admin-categories", page, limit, searchTerm, sort, sortOrder],
     queryFn: async () => {
-      console.log("Fetching categories...");
       const response = await categoryManagementService.getCategories({
         page,
         limit,

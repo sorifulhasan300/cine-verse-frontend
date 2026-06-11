@@ -9,8 +9,6 @@ interface MoviePlayerProps {
 }
 
 export function MoviePlayer({ url }: MoviePlayerProps) {
-  console.log("MoviePlayer URL:", url);
-
   if (!url) {
     return (
       <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-[#0d0d1a] border border-slate-800 shadow-2xl flex flex-col items-center justify-center text-slate-400 p-6 text-center">

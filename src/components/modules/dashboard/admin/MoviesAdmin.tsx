@@ -69,7 +69,6 @@ export function MoviesAdmin() {
   } = useQuery({
     queryKey: ["admin-movies", page, limit, searchTerm, sort, sortOrder],
     queryFn: async () => {
-      console.log("Fetching movies...");
       const response = await adminMovieService.getMoviesAdmin({
         page,
         limit,
@@ -82,7 +81,6 @@ export function MoviesAdmin() {
   });
 
   const movies = moviesData?.data || [];
-  console.log(movies, "movies data in MoviesAdmin");
   const pagination = moviesData?.pagination;
 
   const handleMovieCreated = () => {

@@ -54,7 +54,6 @@ const response = await authService.getCurrentUser();
 
 if (response.success && response.data) {
   const user = response.data; // CurrentUser type
-  console.log(user.name, user.email);
 }
 ```
 
@@ -102,7 +101,6 @@ export default function ProfilePage() {
     });
     
     if (result) {
-      console.log("Profile updated!");
     }
   };
 
@@ -137,7 +135,6 @@ async function updateUserProfile() {
     });
 
     if (updateResponse.success) {
-      console.log("Profile updated:", updateResponse.data);
     }
   } catch (error) {
     console.error("Error:", error);

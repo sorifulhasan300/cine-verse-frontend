@@ -41,7 +41,6 @@ export function UsersAdmin() {
   } = useQuery({
     queryKey: ["admin-users", page, limit, search],
     queryFn: async () => {
-      console.log("Fetching users...");
       const response = await userManagementService.getUsers(
         page,
         limit,
@@ -53,14 +52,6 @@ export function UsersAdmin() {
 
   const users = usersData?.data || [];
   const pagination = usersData?.pagination;
-  console.log(
-    "UsersAdmin render - users:",
-    users,
-    "isLoading:",
-    isLoading,
-    "error:",
-    error,
-  );
   const handleUserAction = () => {
     refetch();
   };

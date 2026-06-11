@@ -6,7 +6,6 @@ export const dynamic = 'force-dynamic';
 
 async function WatchListPage() {
   const { data: watchList, error } = await watchListService.getMyWatchList();
-  console.log(watchList);
   if (error) {
     return (
       <div className="p-6 text-center">

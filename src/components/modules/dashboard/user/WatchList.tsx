@@ -14,7 +14,6 @@ export function WatchListGrid({
   watchList: initialWatchList,
 }: WatchListGridProps) {
   const [watchList, setWatchList] = useState(initialWatchList);
-  console.log("watchList move", watchList);
   const handleRemoveFromWatchList = (movieId: string) => {
     setWatchList((prev) => prev.filter((item) => item.movieId !== movieId));
   };

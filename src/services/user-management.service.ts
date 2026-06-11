@@ -14,7 +14,6 @@ export const userManagementService = {
       const response = await api.get<{ users: UserType[], pagination: any }>("/manage-users/users", {
         params,
       });
-      console.log("users data", response);
       return {
         data: response.data.users || [],
         pagination: response.data.pagination || {},
