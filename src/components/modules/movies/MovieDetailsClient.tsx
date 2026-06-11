@@ -80,7 +80,11 @@ export function MovieDetailsClient({
           <p className="text-red-400 text-lg mb-4">
             {(error as Error).message}
           </p>
-          <Button onClick={() => router.back()} variant="outline">
+          <Button
+            onClick={() => router.back()}
+            variant="outline"
+            className="hover:text-slate-400  text-black"
+          >
             Go Back
           </Button>
         </div>
@@ -92,6 +96,13 @@ export function MovieDetailsClient({
     return (
       <div className="flex items-center justify-center min-h-screen">
         <p className="text-slate-400">Movie not found</p>
+        <Button
+          onClick={() => router.back()}
+          variant="outline"
+          className="hover:text-slate-400  text-black"
+        >
+          Go Back
+        </Button>
       </div>
     );
   }
@@ -256,7 +267,7 @@ export function MovieDetailsClient({
               <h2 className="text-2xl font-bold text-white mb-6">
                 Reviews ({movie._count.reviews})
               </h2>
-               <ReviewsSection reviews={movie.reviews} movieId={movie.id} />
+              <ReviewsSection reviews={movie.reviews} movieId={movie.id} />
             </div>
           </div>
         </div>

@@ -20,7 +20,7 @@ export async function getSessionFromRequest(
     );
     if (!hasSessionCookie) return null;
 
-    const response = await fetch(`${FRONTEND_URL}/api/auth/get-session`, {
+    const response = await fetch(`${env.NEXT_PUBLIC_BACKEND_URL}/api/auth/get-session`, {
       headers: {
         cookie: cookieHeader,
         origin: FRONTEND_URL,
@@ -50,7 +50,7 @@ export async function getCurrentUser(): Promise<session | null> {
     );
     if (!hasSessionCookie) return null;
 
-    const response = await fetch(`${FRONTEND_URL}/api/auth/get-session`, {
+    const response = await fetch(`${env.NEXT_PUBLIC_BACKEND_URL}/api/auth/get-session`, {
       headers: {
         cookie,
         origin: FRONTEND_URL,

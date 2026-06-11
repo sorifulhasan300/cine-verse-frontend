@@ -21,7 +21,6 @@ export const adminMovieService = {
   }> {
     try {
       const response = await api.get<MovieResponse>("/movie/admin", { params });
-      console.log("movies data", response);
       return {
         success: true,
         data: response.data.data || [],
