@@ -123,12 +123,6 @@ export default function HelplinePage() {
               </div>
             ))}
           </div>
-
-          <div className="text-center mt-8">
-            <Button variant="outline" className="border-slate-600 hover:bg-slate-800 text-slate-300">
-              View All FAQs
-            </Button>
-          </div>
         </div>
 
         {/* Office Info */}

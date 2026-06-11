@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Film, Users, Award, Globe, Heart, Star, Play, TrendingUp } from "lucide-react";
+import Image from "next/image";
 
 export default function AboutPage() {
   const stats = [
@@ -39,7 +40,7 @@ export default function AboutPage() {
     {
       name: "Sarah Johnson",
       role: "CEO & Founder",
-      image: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150",
+      image: "https://images.pexels.com/photos/30976004/pexels-photo-30976004.jpeg",
       bio: "Former film industry executive with 15+ years of experience in digital media."
     },
     {
@@ -162,7 +163,9 @@ export default function AboutPage() {
               <Card key={index} className="bg-slate-800 border-slate-700 text-center">
                 <CardHeader>
                   <div className="w-24 h-24 rounded-full overflow-hidden mx-auto mb-4">
-                    <img
+                    <Image
+                      width={100}
+                      height={100}
                       src={member.image}
                       alt={member.name}
                       className="w-full h-full object-cover"

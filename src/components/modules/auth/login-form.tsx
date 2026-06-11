@@ -309,7 +309,7 @@ export function LoginForm({
         </div>
 
         {/* Bottom: sign up link */}
-        <p className="text-center text-[12px] text-slate-600 mt-6">
+        <p className="text-center text-[12px] cursor-pointer text-slate-600 mt-6">
           Don&apos;t have an account?{" "}
           <Link
             href="/register"

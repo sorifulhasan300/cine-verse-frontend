@@ -2,11 +2,12 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Bot, Send, X, Loader2 } from "lucide-react";
+import { Send, X, Loader2, Film, Sparkles, Bot } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useForm } from "@tanstack/react-form";
+import { cn } from "@/lib/utils";
 
 export default function FloatingChat() {
   const [isOpen, setIsOpen] = useState(false);
@@ -14,7 +15,7 @@ export default function FloatingChat() {
     Array<{ role: string; content: string }>
   >([]);
   const [isLoading, setIsLoading] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   const form = useForm({
     defaultValues: {
@@ -37,7 +38,7 @@ export default function FloatingChat() {
             body: JSON.stringify({
               messages: [...messages, { role: "user", content: userMessage }],
             }),
-          },
+          }
         );
 
         if (!res.ok) throw new Error("Failed to send message");
@@ -60,14 +61,16 @@ export default function FloatingChat() {
     },
   });
 
+  // Automatically scroll to bottom when messages or loading state change
   useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollTop = messagesEndRef.current.scrollHeight;
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
     }
   }, [messages, isLoading]);
 
   return (
     <>
+      {/* ── Floating Action Trigger Button ── */}
       <motion.div
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
@@ -76,75 +79,123 @@ export default function FloatingChat() {
         <Button
           onClick={() => setIsOpen(!isOpen)}
           size="icon"
-          className="h-14 w-14 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 shadow-2xl"
+          className="h-14 w-14 rounded-full bg-red-600 hover:bg-red-700 shadow-2xl transition-colors duration-150 border border-red-500/20"
         >
-          {isOpen ? <X className="h-6 w-6" /> : <Bot className="h-6 w-6" />}
+          {isOpen ? <X className="h-5 w-5 text-white" /> : <Bot className="h-6 w-6" />}
         </Button>
       </motion.div>
 
+      {/* ── Chat Window Box ── */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            className="fixed bottom-24 right-6 z-50 w-[350px] h-[500px] bg-zinc-950 border border-zinc-800 rounded-2xl shadow-2xl flex flex-col"
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+            transition={{ duration: 0.15 }}
+            className="fixed bottom-24 right-6 z-50 w-[360px] h-[520px] bg-[#11111c] border border-slate-800 rounded-xl shadow-2xl flex flex-col overflow-hidden"
           >
-            <div className="p-4 bg-zinc-900 border-b border-zinc-800 flex items-center gap-3">
-              <Bot className="h-5 w-5 text-purple-400" />
-              <h3 className="text-sm font-bold text-zinc-100">CineVerse AI</h3>
+            {/* Header Area */}
+            <div className="p-4 bg-[#0d0d1a] border-b border-slate-800 flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="w-7 h-7 bg-red-600 rounded-md flex items-center justify-center flex-shrink-0">
+                  <Film className="w-3.5 h-3.5 text-white" />
+                </div>
+                <div>
+                  <p className="text-[14px] font-medium text-white leading-none">CineVerse AI</p>
+                  <p className="text-[9px] text-slate-500 tracking-[1px] uppercase mt-0.5">
+                    Cinematic Assistant
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsOpen(false)}
+                className="text-slate-500 hover:text-slate-300 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              {messages.map((m, index) => (
-                <div
-                  key={index}
-                  className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
-                >
+            {/* Chat Body Window Space */}
+            <div className="relative flex-1 overflow-y-auto p-4 space-y-4 bg-[#11111c]">
+
+              {/* Central Background Watermark Logo Layout */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center opacity-[0.02] pointer-events-none select-none z-0">
+                <Film className="w-40 h-40 text-white mb-2" />
+                <span className="text-2xl font-bold tracking-[6px] text-white uppercase">CineVerse</span>
+              </div>
+
+              {/* Messages Map Render */}
+              <div className="relative z-10 space-y-4">
+                {messages.length === 0 && (
+                  <div className="text-center pt-8 px-4 pointer-events-none">
+                    <Sparkles className="w-5 h-5 text-red-500/40 mx-auto mb-2" />
+                    <p className="text-[13px] text-slate-600">
+                      Welcome to CineVerse! Ask me anything about movies, actors, directors, or showtimes.
+                    </p>
+                  </div>
+                )}
+
+                {messages.map((m, index) => (
                   <div
-                    className={`p-3 text-white rounded-2xl text-sm ${m.role === "user" ? "bg-purple-600" : "bg-zinc-900"}`}
+                    key={index}
+                    className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
                   >
-                    {m.content}
+                    <div
+                      className={cn(
+                        "max-w-[85%] p-3 rounded-xl text-[13px] leading-relaxed shadow-sm break-words",
+                        m.role === "user"
+                          ? "bg-red-600 text-white rounded-tr-none"
+                          : "bg-[#0d0d1a] border border-slate-800 text-slate-300 rounded-tl-none"
+                      )}
+                    >
+                      {m.content}
+                    </div>
                   </div>
-                </div>
-              ))}
-              {isLoading && (
-                <div className="flex justify-start">
-                  <div className="p-3 rounded-2xl text-sm bg-zinc-900">
-                    <Loader2 className="h-4 w-4 animate-spin" />
+                ))}
+
+                {/* AI Processing Bubble Loader */}
+                {isLoading && (
+                  <div className="flex justify-start">
+                    <div className="p-3 rounded-xl rounded-tl-none bg-[#0d0d1a] border border-slate-800 text-slate-500">
+                      <Loader2 className="h-4 w-4 animate-spin text-red-500" />
+                    </div>
                   </div>
-                </div>
-              )}
-              <div ref={messagesEndRef} />
+                )}
+
+                {/* Scroll Target Element */}
+                <div ref={messagesContainerRef} />
+              </div>
             </div>
 
+            {/* Bottom Form Control Input Bar */}
             <form
               onSubmit={(e) => {
                 e.preventDefault();
                 form.handleSubmit();
               }}
-              className="p-4 bg-zinc-900/50"
+              className="p-3 bg-[#0d0d1a] border-t border-slate-800"
             >
               <form.Field name="message">
                 {({ state, handleChange, handleBlur }) => (
-                  <div className="relative">
+                  <div className="relative flex items-center">
                     <Input
                       value={state.value}
                       onChange={(e) => handleChange(e.target.value)}
                       onBlur={handleBlur}
                       placeholder="Ask CineVerse..."
-                      className="bg-zinc-950 border-zinc-800 text-white"
+                      className="w-full pl-3 pr-10 py-5 bg-[#11111c] border-slate-800 text-slate-300 placeholder-slate-700 text-[13px] focus:border-red-600 focus-visible:ring-0 rounded-lg"
                       disabled={isLoading}
                     />
                     <button
                       type="submit"
-                      className="absolute right-2 top-2 text-purple-500"
-                      disabled={isLoading}
+                      className="absolute right-2.5 p-1.5 text-slate-500 hover:text-red-500 disabled:opacity-40 transition-colors duration-150"
+                      disabled={isLoading || !state.value.trim()}
                     >
                       {isLoading ? (
-                        <Loader2 className="h-5 w-5 animate-spin" />
+                        <Loader2 className="h-4 w-4 animate-spin" />
                       ) : (
-                        <Send className="h-5 w-5" />
+                        <Send className="h-4 w-4" />
                       )}
                     </button>
                   </div>
