@@ -11,6 +11,7 @@ import { MovieCard } from "@/components/ui/movie-card";
 import { toast } from "sonner";
 import Link from "next/link";
 import { PopularMovie } from "@/types/role.types";
+import GenericErrorCard from "./generic-error-card";
 
 export function TrendingMovies() {
   const [movies, setMovies] = useState<PopularMovie[]>([]);
@@ -73,18 +74,15 @@ export function TrendingMovies() {
 
   if (error) {
     return (
-      <section className="py-20 bg-slate-950">
+      <section className="py-20 lg:py-40 bg-slate-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <p className="text-red-400 mb-4">
-              Failed to load trending movies: {error}
-            </p>
-            <Button
-              onClick={() => window.location.reload()}
-              className="bg-red-600 hover:bg-red-700"
-            >
-              Try Again
-            </Button>
+          <div className="mx-auto max-w-3xl">
+            <GenericErrorCard
+              title="Unable to load trending movies"
+              description={error}
+              errorName="Network error"
+              onAction={() => window.location.reload()}
+            />
           </div>
         </div>
       </section>

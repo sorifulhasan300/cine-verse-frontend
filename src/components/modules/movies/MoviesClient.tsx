@@ -22,6 +22,7 @@ import { Loader2 } from "lucide-react";
 import { categoryService } from "@/services/category.service";
 import { Category } from "@/types/category.types";
 import { movieService } from "@/services/movie.service";
+import GenericErrorCard from "@/components/ui/generic-error-card";
 
 interface Pagination {
   totalPages: number;
@@ -234,7 +235,17 @@ export function MoviesClient({ dehydratedState }: MoviesClientProps) {
 
           {error ? (
             <div className="text-center py-12">
-              <p className="text-red-400">{(error as Error).message}</p>
+              <section className="py-20 lg:py-40 bg-slate-950">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                  <div className="mx-auto max-w-3xl">
+                    <GenericErrorCard
+                      title="Unable to load movies"
+                      errorName="Network error"
+                      onAction={() => window.location.reload()}
+                    />
+                  </div>
+                </div>
+              </section>
             </div>
           ) : movies.length === 0 &&
             (debouncedSearchTerm ||

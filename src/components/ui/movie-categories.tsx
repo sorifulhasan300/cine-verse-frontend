@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Film, Target, Heart, Zap, Eye, Laugh } from "lucide-react";
 import { categoryService } from "@/services/category.service";
 import { Category } from "@/types/category.types";
+import GenericErrorCard from "./generic-error-card";
 
 type CategoryWithMeta = Category & {
   icon: React.ComponentType<{ className?: string }>;
@@ -54,17 +55,21 @@ export function MovieCategories() {
         }
 
         const apiCategories = response.data || [];
-        const categoriesWithMeta: CategoryWithMeta[] = apiCategories.slice(0, 6).map((category) => ({
-          ...category,
-          icon: iconMap[category.name] || Film,
-          color: colorMap[category.name] || "from-gray-600 to-gray-500",
-          description: descriptionMap[category.name] || "Explore this genre",
-          count: category.movieCount || category.count || 0,
-        }));
+        const categoriesWithMeta: CategoryWithMeta[] = apiCategories
+          .slice(0, 6)
+          .map((category) => ({
+            ...category,
+            icon: iconMap[category.name] || Film,
+            color: colorMap[category.name] || "from-gray-600 to-gray-500",
+            description: descriptionMap[category.name] || "Explore this genre",
+            count: category.movieCount || category.count || 0,
+          }));
 
         setCategories(categoriesWithMeta);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load categories");
+        setError(
+          err instanceof Error ? err.message : "Failed to load categories",
+        );
       } finally {
         setLoading(false);
       }
@@ -84,7 +89,10 @@ export function MovieCategories() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="bg-slate-800 border border-slate-700 rounded-2xl p-6">
+              <div
+                key={i}
+                className="bg-slate-800 border border-slate-700 rounded-2xl p-6"
+              >
                 <div className="animate-pulse">
                   <div className="flex items-center gap-4 mb-4">
                     <div className="w-12 h-12 bg-slate-700 rounded-xl"></div>
@@ -106,16 +114,15 @@ export function MovieCategories() {
 
   if (error) {
     return (
-      <section className="py-20 bg-slate-900">
+      <section className="py-20 lg:py-40 bg-slate-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <p className="text-red-400 mb-4">Failed to load categories: {error}</p>
-            <button
-              onClick={() => window.location.reload()}
-              className="text-red-400 hover:text-red-300 font-semibold transition-colors"
-            >
-              Try Again
-            </button>
+          <div className="mx-auto max-w-3xl">
+            <GenericErrorCard
+              title="Unable to load category"
+              description={error}
+              errorName="Network error"
+              onAction={() => window.location.reload()}
+            />
           </div>
         </div>
       </section>
@@ -127,15 +134,18 @@ export function MovieCategories() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-12">
-          <Badge variant="secondary" className="mb-4 bg-red-600/10 text-red-400 border-red-600/20">
+          <Badge
+            variant="secondary"
+            className="mb-4 bg-red-600/10 text-red-400 border-red-600/20"
+          >
             🎭 Explore Genres
           </Badge>
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
             Movie Categories
           </h2>
           <p className="text-xl text-slate-400 max-w-2xl mx-auto">
-            Find your perfect movie in our extensive collection of genres.
-            From action-packed blockbusters to heartwarming dramas.
+            Find your perfect movie in our extensive collection of genres. From
+            action-packed blockbusters to heartwarming dramas.
           </p>
         </div>
 
@@ -149,23 +159,34 @@ export function MovieCategories() {
                 className="group relative bg-slate-800 border border-slate-700 rounded-2xl p-6 hover:border-slate-600 transition-all duration-300 cursor-pointer overflow-hidden"
               >
                 {/* Background Gradient */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${category.color} opacity-0 group-hover:opacity-5 transition-opacity duration-300`} />
+                <div
+                  className={`absolute inset-0 bg-gradient-to-br ${category.color} opacity-0 group-hover:opacity-5 transition-opacity duration-300`}
+                />
 
                 {/* Content */}
                 <div className="relative z-10">
                   <div className="flex items-center gap-4 mb-4">
-                    <div className={`p-3 rounded-xl bg-gradient-to-br ${category.color} shadow-lg`}>
+                    <div
+                      className={`p-3 rounded-xl bg-gradient-to-br ${category.color} shadow-lg`}
+                    >
                       <Icon className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                      <h3 className="text-xl font-bold text-white">{category.name}</h3>
-                      <p className="text-sm text-slate-400">{category.count} movies</p>
+                      <h3 className="text-xl font-bold text-white">
+                        {category.name}
+                      </h3>
+                      <p className="text-sm text-slate-400">
+                        {category.count} movies
+                      </p>
                     </div>
                   </div>
 
                   <p className="text-slate-300 mb-4">{category.description}</p>
 
-                  <Badge variant="outline" className="border-slate-600 text-slate-400">
+                  <Badge
+                    variant="outline"
+                    className="border-slate-600 text-slate-400"
+                  >
                     Explore {category.name}
                   </Badge>
                 </div>
