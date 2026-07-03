@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
@@ -19,6 +19,10 @@ export function VerifyOtpForm({
   ...props
 }: React.ComponentProps<"div"> & { email?: string }) {
   const router = useRouter();
+
+  const [secondsLeft, setSecondsLeft] = useState(120);
+  const [isExpired, setIsExpired] = useState(false);
+  const [isResending, setIsResending] = useState(false);
 
   const form = useForm({
     defaultValues: {
@@ -45,6 +49,13 @@ export function VerifyOtpForm({
   });
   const handleResendOTP = async () => {
     const email = form.state.values.email.trim();
+    if (!email) {
+      toast.error("Please enter your email to resend the code");
+      return;
+    }
+
+    setIsResending(true);
+    const toastId = toast.loading("Resending OTP...");
 
     const { data, error } = await authClient.sendVerificationEmail({
       email: email,
@@ -52,12 +63,30 @@ export function VerifyOtpForm({
     });
     console.log(data);
     if (error) {
-      console.error("OTP রিসেন্ড করতে সমস্যা হয়েছে:", error.message);
-      alert(error.message);
+      console.error("Failed to resend OTP:", error.message);
+      toast.error(error.message, { id: toastId });
     } else {
-      alert("আপনার ইমেইলে নতুন ওটিপি (OTP) কোড পাঠানো হয়েছে!");
+      toast.success("OTP resent to your email", { id: toastId });
+      setSecondsLeft(120);
+      setIsExpired(false);
     }
+    setIsResending(false);
   };
+
+  useEffect(() => {
+    if (isExpired) return;
+    if (secondsLeft <= 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setIsExpired(true);
+      return;
+    }
+
+    const id = setInterval(() => {
+      setSecondsLeft((s) => s - 1);
+    }, 1000);
+
+    return () => clearInterval(id);
+  }, [secondsLeft, isExpired]);
   return (
     <div
       className={cn(
@@ -191,13 +220,21 @@ export function VerifyOtpForm({
       {/* Bottom Footer Text */}
       <p className="text-center text-[12px] text-slate-600 mt-6">
         Didn&lsquo;t receive the code?{" "}
-        <button
-          type="button"
-          onClick={() => handleResendOTP()}
-          className="text-red-500 hover:text-red-400 transition-colors cursor-pointer bg-transparent border-none p-0 inline font-medium"
-        >
-          Resend Code
-        </button>
+        {!isExpired && secondsLeft > 0 ? (
+          <span className="text-slate-500">
+            Resend available in {Math.floor(secondsLeft / 60)}:
+            {String(secondsLeft % 60).padStart(2, "0")}
+          </span>
+        ) : (
+          <button
+            type="button"
+            onClick={() => handleResendOTP()}
+            disabled={isResending}
+            className="text-red-500 hover:text-red-400 transition-colors cursor-pointer bg-transparent border-none p-0 inline font-medium disabled:opacity-50"
+          >
+            {isResending ? "Resending..." : "Resend Code"}
+          </button>
+        )}
       </p>
     </div>
   );

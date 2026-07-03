@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { subscriptionService } from "@/services/subscription.service";
-import { updateSession } from "@/lib/auth-client";
+import { authClient } from "@/lib/auth-client";
 import Link from "next/link";
 
 interface SubscriptionStatus {
@@ -24,32 +24,62 @@ export default function PaymentSuccess() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const { refetch: refetchSession } = authClient.useSession();
 
-  const checkStatus = async () => {
-    try {
-      setRefreshing(true);
-      const response = await subscriptionService.checkSubscriptionStatus();
-      if (response.success && response.data) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        setStatus(response.data as any);
-        setError(null);
-        setLoading(false);
-        // Update session to reflect new subscription status
-        await updateSession();
-      } else {
-        setError(response.message || "Failed to verify subscription");
-        setStatus(null);
-        setLoading(false);
+  useEffect(() => {
+    let mounted = true;
+
+    const refreshAuthSession = async () => {
+      try {
+        await refetchSession({ query: { disableCookieCache: true } });
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.warn("Failed to refetch Better Auth session:", e);
       }
-    } catch {
-      setError("An error occurred while verifying your subscription");
-      setStatus(null);
-    } finally {
-      setRefreshing(false);
-    }
-  };
 
-  checkStatus();
+      try {
+        await authClient.getSession({ query: { disableCookieCache: true } });
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.warn("Failed to get Better Auth session after payment:", e);
+      }
+
+      authClient.$store?.notify?.("$sessionSignal");
+    };
+
+    const checkStatus = async () => {
+      try {
+        setRefreshing(true);
+        const response = await subscriptionService.checkSubscriptionStatus();
+
+        if (!mounted) return;
+
+        if (response.success && response.data) {
+          setStatus(response.data as SubscriptionStatus);
+          setError(null);
+          setLoading(false);
+
+          await refreshAuthSession();
+        } else {
+          setError(response.message || "Failed to verify subscription");
+          setStatus(null);
+          setLoading(false);
+        }
+      } catch (err) {
+        if (!mounted) return;
+        setError("An error occurred while verifying your subscription");
+        setStatus(null);
+      } finally {
+        if (mounted) setRefreshing(false);
+      }
+    };
+
+    checkStatus();
+
+    return () => {
+      mounted = false;
+    };
+  }, [refetchSession]);
 
   if (loading) {
     return (

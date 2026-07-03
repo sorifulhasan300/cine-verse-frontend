@@ -42,7 +42,7 @@ export const authService = {
     }
 
     try {
-      const response = await fetch(`${authUrl}/forgot-password`, {
+      const response = await fetch(`${authUrl}/auth/forgot-password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -68,12 +68,13 @@ export const authService = {
     }
   },
   resetPassword: async (email: string, otp: string, newPassword: string) => {
+    console.log("Resetting password with:", { email, otp, newPassword });
     if (!email || !otp || !newPassword) {
       throw new Error("All fields are required.");
     }
 
     try {
-      const response = await fetch(`${authUrl}/reset-password`, {
+      const response = await fetch(`${authUrl}/auth/reset-password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

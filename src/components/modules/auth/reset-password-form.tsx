@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
@@ -8,7 +8,16 @@ import { useRouter } from "next/navigation";
 import { useForm } from "@tanstack/react-form";
 import { toast } from "sonner";
 import z from "zod";
-import { Film, Key, Lock, Mail, ArrowLeft, Eye, EyeOff, CheckCircle2 } from "lucide-react";
+import {
+  Film,
+  Key,
+  Lock,
+  Mail,
+  ArrowLeft,
+  Eye,
+  EyeOff,
+  CheckCircle2,
+} from "lucide-react";
 import { authService } from "@/services/auth.service";
 import { FieldError } from "@/components/ui/field";
 
@@ -24,6 +33,10 @@ export function ResetPasswordForm({
 }: React.ComponentProps<"div">) {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
+  const [secondsLeft, setSecondsLeft] = useState(120); // 2 minutes
+  const [isExpired, setIsExpired] = useState(false);
+  const [isResending, setIsResending] = useState(false);
+  const [emailValue, setEmailValue] = useState("");
 
   const form = useForm({
     defaultValues: {
@@ -49,11 +62,26 @@ export function ResetPasswordForm({
     },
   });
 
+  useEffect(() => {
+    if (isExpired) return;
+    if (secondsLeft <= 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setIsExpired(true);
+      return;
+    }
+
+    const id = setInterval(() => {
+      setSecondsLeft((s) => s - 1);
+    }, 1000);
+
+    return () => clearInterval(id);
+  }, [secondsLeft, isExpired]);
+
   return (
     <div
       className={cn(
         "w-full max-w-md mx-auto bg-[#11111c] border border-slate-800 rounded-xl px-7 py-8 flex flex-col justify-between min-w-0 shadow-2xl",
-        className
+        className,
       )}
       {...props}
     >
@@ -65,7 +93,9 @@ export function ResetPasswordForm({
               <Film className="w-4 h-4 text-white" />
             </div>
             <div>
-              <p className="text-[15px] font-medium text-white leading-none">CineVerse</p>
+              <p className="text-[15px] font-medium text-white leading-none">
+                CineVerse
+              </p>
               <p className="text-[9px] text-slate-600 tracking-[2px] uppercase mt-0.5">
                 Stream · Discover
               </p>
@@ -81,7 +111,9 @@ export function ResetPasswordForm({
           </Link>
         </div>
 
-        <h1 className="text-[20px] font-medium text-white mb-1">Reset Password</h1>
+        <h1 className="text-[20px] font-medium text-white mb-1">
+          Reset Password
+        </h1>
         <p className="text-[13px] text-slate-600 mb-6">
           Enter the OTP from your email and your new password
         </p>
@@ -101,9 +133,22 @@ export function ResetPasswordForm({
                   field.state.meta.isTouched && !field.state.meta.isValid;
                 return (
                   <div className="flex flex-col gap-1.5">
-                    <label htmlFor={field.name} className="text-[12px] text-slate-500">
-                      Email address
-                    </label>
+                    <div className="flex items-center justify-between">
+                      <label
+                        htmlFor={field.name}
+                        className="text-[12px] text-slate-500"
+                      >
+                        Email address
+                      </label>
+                      <div className="text-[12px] text-slate-500">
+                        {secondsLeft > 0 && !isExpired && (
+                          <span>
+                            OTP expires in {Math.floor(secondsLeft / 60)}:
+                            {String(secondsLeft % 60).padStart(2, "0")}
+                          </span>
+                        )}
+                      </div>
+                    </div>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600 pointer-events-none" />
                       <Input
@@ -112,7 +157,10 @@ export function ResetPasswordForm({
                         name={field.name}
                         value={field.state.value}
                         onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(e.target.value)}
+                        onChange={(e) => {
+                          field.handleChange(e.target.value);
+                          setEmailValue(e.target.value);
+                        }}
                         placeholder="you@example.com"
                         autoComplete="email"
                         className="pl-10 bg-[#0d0d1a] border-slate-800 text-slate-300 placeholder-slate-700 focus:border-red-600 focus-visible:ring-0"
@@ -133,9 +181,58 @@ export function ResetPasswordForm({
                   field.state.meta.isTouched && !field.state.meta.isValid;
                 return (
                   <div className="flex flex-col gap-1.5">
-                    <label htmlFor={field.name} className="text-[12px] text-slate-500">
-                      One-Time Password (OTP)
-                    </label>
+                    <div className="flex items-center justify-between">
+                      <label
+                        htmlFor={field.name}
+                        className="text-[12px] text-slate-500"
+                      >
+                        One-Time Password (OTP)
+                      </label>
+                      <div className="text-[12px]">
+                        {!isExpired && secondsLeft > 0 ? (
+                          <span className="text-slate-500">
+                            {Math.floor(secondsLeft / 60)}:
+                            {String(secondsLeft % 60).padStart(2, "0")}
+                          </span>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={async () => {
+                              if (!emailValue) {
+                                toast.error(
+                                  "Please enter your email to resend the code",
+                                );
+                                return;
+                              }
+                              setIsResending(true);
+                              const toastId = toast.loading("Resending OTP...");
+                              try {
+                                await authService.requestPasswordReset(
+                                  emailValue,
+                                );
+                                setSecondsLeft(120);
+                                setIsExpired(false);
+                                toast.success("OTP resent to your email", {
+                                  id: toastId,
+                                });
+                              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                              } catch (error: any) {
+                                const errorMessage =
+                                  error.response?.data?.message ||
+                                  "Something went wrong";
+                                toast.error(errorMessage, { id: toastId });
+                              } finally {
+                                setIsResending(false);
+                              }
+                            }}
+                            disabled={isResending}
+                            className="text-red-500 hover:text-red-400 transition-colors"
+                          >
+                            Resend code
+                          </button>
+                        )}
+                      </div>
+                    </div>
                     <div className="relative">
                       <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600 pointer-events-none" />
                       <Input
@@ -164,7 +261,10 @@ export function ResetPasswordForm({
                   field.state.meta.isTouched && !field.state.meta.isValid;
                 return (
                   <div className="flex flex-col gap-1.5">
-                    <label htmlFor={field.name} className="text-[12px] text-slate-500">
+                    <label
+                      htmlFor={field.name}
+                      className="text-[12px] text-slate-500"
+                    >
                       New Password
                     </label>
                     <div className="relative">
@@ -185,7 +285,11 @@ export function ResetPasswordForm({
                         onClick={() => setShowPassword(!showPassword)}
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-600 hover:text-slate-400 transition-colors"
                       >
-                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                        {showPassword ? (
+                          <EyeOff size={16} />
+                        ) : (
+                          <Eye size={16} />
+                        )}
                       </button>
                     </div>
                     {isInvalid && (
