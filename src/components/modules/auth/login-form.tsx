@@ -2,15 +2,7 @@
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
-import {
-  Film,
-  Lock,
-  Mail,
-  ArrowLeft,
-  Play,
-  Shield,
-  User,
-} from "lucide-react";
+import { Film, Lock, Mail, ArrowLeft, Play, Shield, User } from "lucide-react";
 import { useForm } from "@tanstack/react-form";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -37,6 +29,10 @@ export function LoginForm({
       try {
         const { error } = await authClient.signIn.email(value);
         if (error) {
+          if (error.code === "EMAIL_NOT_VERIFIED") {
+            router.push("/verify-email");
+            return;
+          }
           toast.error(error.message, { id: toastId });
           return;
         }
@@ -52,7 +48,7 @@ export function LoginForm({
     <div
       className={cn(
         "w-full max-w-4xl mx-auto flex rounded-xl overflow-hidden border border-slate-800 shadow-2xl",
-        className
+        className,
       )}
       {...props}
     >
@@ -88,16 +84,28 @@ export function LoginForm({
         />
 
         {/* Sprocket holes — top */}
-        <div className="absolute top-0 left-0 right-0 flex gap-4 px-3 py-2 z-10" aria-hidden="true">
+        <div
+          className="absolute top-0 left-0 right-0 flex gap-4 px-3 py-2 z-10"
+          aria-hidden="true"
+        >
           {Array.from({ length: 10 }).map((_, i) => (
-            <div key={i} className="w-[18px] h-3 bg-black/70 rounded-[3px] flex-shrink-0" />
+            <div
+              key={i}
+              className="w-[18px] h-3 bg-black/70 rounded-[3px] flex-shrink-0"
+            />
           ))}
         </div>
 
         {/* Sprocket holes — bottom */}
-        <div className="absolute bottom-0 left-0 right-0 flex gap-4 px-3 py-2 z-10" aria-hidden="true">
+        <div
+          className="absolute bottom-0 left-0 right-0 flex gap-4 px-3 py-2 z-10"
+          aria-hidden="true"
+        >
           {Array.from({ length: 10 }).map((_, i) => (
-            <div key={i} className="w-[18px] h-3 bg-black/70 rounded-[3px] flex-shrink-0" />
+            <div
+              key={i}
+              className="w-[18px] h-3 bg-black/70 rounded-[3px] flex-shrink-0"
+            />
           ))}
         </div>
 
@@ -113,8 +121,12 @@ export function LoginForm({
           <div className="flex items-center gap-3 bg-red-900/20 border border-red-700/30 rounded-lg px-3 py-2 mb-5 w-fit">
             <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse flex-shrink-0" />
             <div>
-              <p className="text-[10px] text-slate-500 leading-none mb-0.5">Now streaming</p>
-              <p className="text-[13px] text-slate-200 font-medium leading-none">Dune: Part Two</p>
+              <p className="text-[10px] text-slate-500 leading-none mb-0.5">
+                Now streaming
+              </p>
+              <p className="text-[13px] text-slate-200 font-medium leading-none">
+                Dune: Part Two
+              </p>
             </div>
             <div className="ml-4 text-right">
               <p className="text-amber-400 text-[12px] leading-none">★★★★★</p>
@@ -129,7 +141,9 @@ export function LoginForm({
           </div>
 
           <h2 className="text-[22px] font-medium text-white leading-snug mb-2">
-            Your cinema,<br />your universe.
+            Your cinema,
+            <br />
+            your universe.
           </h2>
           <p className="text-[13px] text-slate-500 mb-4">
             Stream thousands of films. Discover what moves you.
@@ -158,7 +172,9 @@ export function LoginForm({
                 <Film className="w-4 h-4 text-white" />
               </div>
               <div>
-                <p className="text-[15px] font-medium text-white leading-none">CineVerse</p>
+                <p className="text-[15px] font-medium text-white leading-none">
+                  CineVerse
+                </p>
                 <p className="text-[9px] text-slate-600 tracking-[2px] uppercase mt-0.5">
                   Stream · Discover
                 </p>
@@ -174,8 +190,12 @@ export function LoginForm({
             </Link>
           </div>
 
-          <h1 className="text-[20px] font-medium text-white mb-1">Welcome back</h1>
-          <p className="text-[13px] text-slate-600 mb-6">Sign in to continue watching</p>
+          <h1 className="text-[20px] font-medium text-white mb-1">
+            Welcome back
+          </h1>
+          <p className="text-[13px] text-slate-600 mb-6">
+            Sign in to continue watching
+          </p>
 
           <form
             id="login-form"

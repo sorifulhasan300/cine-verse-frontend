@@ -11,6 +11,7 @@ import { verifyOtpSchema } from "@/zod/auth.validation";
 import { Film, ArrowLeft, ShieldCheck, Mail } from "lucide-react";
 import { authService } from "@/services/auth.service";
 import { FieldError } from "@/components/ui/field";
+import { authClient } from "@/lib/auth-client";
 
 export function VerifyOtpForm({
   className,
@@ -37,17 +38,31 @@ export function VerifyOtpForm({
       } catch (error) {
         toast.error(
           error instanceof Error ? error.message : "Verification failed",
-          { id: toastId }
+          { id: toastId },
         );
       }
     },
   });
+  const handleResendOTP = async () => {
+    const email = form.state.values.email.trim();
 
+    const { data, error } = await authClient.sendVerificationEmail({
+      email: email,
+      callbackURL: "/sign-in",
+    });
+    console.log(data);
+    if (error) {
+      console.error("OTP রিসেন্ড করতে সমস্যা হয়েছে:", error.message);
+      alert(error.message);
+    } else {
+      alert("আপনার ইমেইলে নতুন ওটিপি (OTP) কোড পাঠানো হয়েছে!");
+    }
+  };
   return (
     <div
       className={cn(
         "w-full max-w-md mx-auto bg-[#11111c] border border-slate-800 rounded-xl px-7 py-8 flex flex-col justify-between min-w-0 shadow-2xl",
-        className
+        className,
       )}
       {...props}
     >
@@ -55,11 +70,13 @@ export function VerifyOtpForm({
         {/* Top row: logo + back exit */}
         <div className="flex items-start justify-between mb-7">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center flex-shrink-0">
+            <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center shrink-0">
               <Film className="w-4 h-4 text-white" />
             </div>
             <div>
-              <p className="text-[15px] font-medium text-white leading-none">CineVerse</p>
+              <p className="text-[15px] font-medium text-white leading-none">
+                CineVerse
+              </p>
               <p className="text-[9px] text-slate-600 tracking-[2px] uppercase mt-0.5">
                 Stream · Discover
               </p>
@@ -75,7 +92,9 @@ export function VerifyOtpForm({
           </Link>
         </div>
 
-        <h1 className="text-[20px] font-medium text-white mb-1">Verify Your Email</h1>
+        <h1 className="text-[20px] font-medium text-white mb-1">
+          Verify Your Email
+        </h1>
         <p className="text-[13px] text-slate-600 mb-6">
           Enter the 6-digit OTP sent to your email address
         </p>
@@ -95,7 +114,10 @@ export function VerifyOtpForm({
                   field.state.meta.isTouched && !field.state.meta.isValid;
                 return (
                   <div className="flex flex-col gap-1.5">
-                    <label htmlFor={field.name} className="text-[12px] text-slate-500">
+                    <label
+                      htmlFor={field.name}
+                      className="text-[12px] text-slate-500"
+                    >
                       Email address
                     </label>
                     <div className="relative">
@@ -126,7 +148,10 @@ export function VerifyOtpForm({
                   field.state.meta.isTouched && !field.state.meta.isValid;
                 return (
                   <div className="flex flex-col gap-1.5">
-                    <label htmlFor={field.name} className="text-[12px] text-slate-500">
+                    <label
+                      htmlFor={field.name}
+                      className="text-[12px] text-slate-500"
+                    >
                       One-Time Password (OTP)
                     </label>
                     <div className="relative">
@@ -168,7 +193,7 @@ export function VerifyOtpForm({
         Didn&lsquo;t receive the code?{" "}
         <button
           type="button"
-          onClick={() => toast.info("Resending OTP feature coming soon!")}
+          onClick={() => handleResendOTP()}
           className="text-red-500 hover:text-red-400 transition-colors cursor-pointer bg-transparent border-none p-0 inline font-medium"
         >
           Resend Code

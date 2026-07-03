@@ -9,7 +9,7 @@ export const authService = {
     }
 
     try {
-      const response = await fetch(`${authUrl}/verify-email`, {
+      const response = await fetch(`${authUrl}/auth/verify-email`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

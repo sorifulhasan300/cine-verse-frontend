@@ -49,9 +49,7 @@ export default function PaymentSuccess() {
     }
   };
 
-  useEffect(() => {
-    checkStatus();
-  }, []);
+  checkStatus();
 
   if (loading) {
     return (
