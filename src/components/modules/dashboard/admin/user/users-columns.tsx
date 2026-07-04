@@ -3,7 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { UserStatus, UserType } from "@/types/user.types";
 import { Badge } from "@/components/ui/badge";
-import { UserActionsCell } from "../table-cell/UserActionSell";
+import { UserActionsCell } from "../../table-cell/UserActionSell";
 
 interface UsersColumnsProps {
   onUserAction: () => void;

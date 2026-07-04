@@ -1,7 +1,7 @@
 import React from "react";
-import { AdminStatisticsGrid } from "@/components/modules/dashboard/admin/AdminStatisticsGrid";
-import { AdminBarChart } from "@/components/modules/dashboard/admin/AdminBarChart";
-import { AdminPieChart } from "@/components/modules/dashboard/admin/AdminPieChart";
+import { AdminStatisticsGrid } from "@/components/modules/dashboard/admin/chart/AdminStatisticsGrid";
+import { AdminBarChart } from "@/components/modules/dashboard/admin/chart/AdminBarChart";
+import { AdminPieChart } from "@/components/modules/dashboard/admin/chart/AdminPieChart";
 import { statisticsService } from "@/services/statistics.service";
 
 export default async function AdminDashboardPage() {

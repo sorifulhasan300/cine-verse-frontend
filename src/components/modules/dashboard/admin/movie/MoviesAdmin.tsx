@@ -12,10 +12,8 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { CreateMovieDialog } from "./CreateMovieDialog";
 import { SortingState, OnChangeFn } from "@tanstack/react-table";
-import {
-  adminMovieService,
-  MovieFormData,
-} from "@/services/admin.movie.service";
+import { adminMovieService } from "@/services/admin.movie.service";
+import { MovieFormData } from "@/types/createMovie.types";
 
 export function MoviesAdmin() {
   const searchParams = useSearchParams();
@@ -159,7 +157,10 @@ export function MoviesAdmin() {
         </div>
       </div>
       <DataTable
-        columns={getMoviesColumns({ onEditMovie: handleEditMovie })}
+        columns={getMoviesColumns({
+          onEditMovie: handleEditMovie,
+          onMovieDeleted: handleMovieCreated,
+        })}
         data={movies}
         pagination={pagination}
         sorting={sorting}

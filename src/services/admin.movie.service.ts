@@ -1,9 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { api } from "@/lib/httpClient";
-import { movieValidationSchema } from "@/zod/movie.validation";
-import z from "zod";
 import { MovieResponse } from "./movie.service";
-export type MovieFormData = z.infer<typeof movieValidationSchema>;
+import { MovieFormData } from "@/types/createMovie.types";
 
 export const adminMovieService = {
   async getMoviesAdmin(params?: {
@@ -62,7 +60,10 @@ export const adminMovieService = {
     error: any;
   }> {
     try {
-      const response = await api.put(`/movie/admin/${id}`, movieData);
+      const response = await api.patch<MovieResponse>(
+        `/movie/admin/${id}`,
+        movieData,
+      );
       return {
         data: response.data,
         error: null,
@@ -71,6 +72,24 @@ export const adminMovieService = {
       return {
         data: null,
         error: error.response?.data?.message || "Failed to update movie",
+      };
+    }
+  },
+
+  async deleteMovie(id: string): Promise<{
+    data: any | null;
+    error: any;
+  }> {
+    try {
+      const response = await api.delete(`/movie/admin/${id}`);
+      return {
+        data: response.data,
+        error: null,
+      };
+    } catch (error: any) {
+      return {
+        data: null,
+        error: error.response?.data?.message || "Failed to delete movie",
       };
     }
   },

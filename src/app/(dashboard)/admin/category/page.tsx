@@ -1,5 +1,5 @@
+import { CategoryAdmin } from "@/components/modules/dashboard/admin/category/CategoryAdmin";
 import React, { Suspense } from "react";
-import { CategoryAdmin } from "@/components/modules/dashboard/admin/CategoryAdmin";
 
 function CategoryLoading() {
   return (

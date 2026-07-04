@@ -1,5 +1,5 @@
+import { MoviesAdmin } from "@/components/modules/dashboard/admin/movie/MoviesAdmin";
 import React, { Suspense } from "react";
-import { MoviesAdmin } from "@/components/modules/dashboard/admin/MoviesAdmin";
 
 function MoviesLoading() {
   return (

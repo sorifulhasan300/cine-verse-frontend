@@ -1,5 +1,5 @@
 import React, { Suspense } from "react";
-import { UsersAdmin } from "@/components/modules/dashboard/admin/UsersAdmin";
+import { UsersAdmin } from "@/components/modules/dashboard/admin/user/UsersAdmin";
 
 function UsersLoading() {
   return (

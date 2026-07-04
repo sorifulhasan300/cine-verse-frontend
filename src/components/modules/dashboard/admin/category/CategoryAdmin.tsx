@@ -1,7 +1,5 @@
 "use client";
-
 import { DataTable } from "@/components/ui/data-table";
-import { getCategoryColumns } from "./category-columns";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { categoryManagementService } from "@/services/category-management.service";
 import { useState, useEffect, useCallback } from "react";
@@ -10,7 +8,6 @@ import { useDebounce } from "use-debounce";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { CreateCategoryDialog } from "./CreateCategoryDialog";
 import { SortingState, OnChangeFn } from "@tanstack/react-table";
 import { toast } from "sonner";
 import { Category } from "@/types/category.types";
@@ -24,6 +21,8 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
+import { getCategoryColumns } from "./category-columns";
+import { CreateCategoryDialog } from "./CreateCategoryDialog";
 
 export function CategoryAdmin() {
   const searchParams = useSearchParams();
@@ -35,9 +34,13 @@ export function CategoryAdmin() {
   const [debouncedSearchInput] = useDebounce(searchInput, 300);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
-  const [editingCategory, setEditingCategory] = useState<Category | undefined>(undefined);
+  const [editingCategory, setEditingCategory] = useState<Category | undefined>(
+    undefined,
+  );
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [deletingCategory, setDeletingCategory] = useState<Category | undefined>(undefined);
+  const [deletingCategory, setDeletingCategory] = useState<
+    Category | undefined
+  >(undefined);
   const [sorting, setSorting] = useState<SortingState>([]);
 
   const handleSortingChange: OnChangeFn<SortingState> = (updaterOrValue) => {
@@ -94,7 +97,8 @@ export function CategoryAdmin() {
   const queryClient = useQueryClient();
 
   const deleteMutation = useMutation({
-    mutationFn: (categoryId: string) => categoryManagementService.deleteCategory(categoryId),
+    mutationFn: (categoryId: string) =>
+      categoryManagementService.deleteCategory(categoryId),
     onSuccess: () => {
       toast.success("Category deleted successfully");
       queryClient.invalidateQueries({ queryKey: ["admin-categories"] });
@@ -140,18 +144,24 @@ export function CategoryAdmin() {
     setDeletingCategory(undefined);
   };
 
-  const handlePageChange = useCallback((newPage: number) => {
-    const params = new URLSearchParams(searchParams);
-    params.set("page", newPage.toString());
-    router.replace(`?${params.toString()}`);
-  }, [searchParams, router]);
+  const handlePageChange = useCallback(
+    (newPage: number) => {
+      const params = new URLSearchParams(searchParams);
+      params.set("page", newPage.toString());
+      router.replace(`?${params.toString()}`);
+    },
+    [searchParams, router],
+  );
 
-  const handleLimitChange = useCallback((newLimit: number) => {
-    setLimit(newLimit);
-    const params = new URLSearchParams(searchParams);
-    params.set("page", "1");
-    router.replace(`?${params.toString()}`);
-  }, [searchParams, router]);
+  const handleLimitChange = useCallback(
+    (newLimit: number) => {
+      setLimit(newLimit);
+      const params = new URLSearchParams(searchParams);
+      params.set("page", "1");
+      router.replace(`?${params.toString()}`);
+    },
+    [searchParams, router],
+  );
 
   if (isLoading) {
     return (
@@ -216,7 +226,7 @@ export function CategoryAdmin() {
       <DataTable
         columns={getCategoryColumns({
           onEditCategory: handleEditCategory,
-          onDeleteCategory: handleDeleteCategory
+          onDeleteCategory: handleDeleteCategory,
         })}
         data={categories}
         pagination={pagination}
@@ -241,12 +251,17 @@ export function CategoryAdmin() {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Category</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete &ldquo;{deletingCategory?.name}&rdquo;? This action cannot be undone.
+              Are you sure you want to delete &ldquo;{deletingCategory?.name}
+              &rdquo;? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={cancelDeleteCategory}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDeleteCategory}>Delete</AlertDialogAction>
+            <AlertDialogCancel onClick={cancelDeleteCategory}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteCategory}>
+              Delete
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
