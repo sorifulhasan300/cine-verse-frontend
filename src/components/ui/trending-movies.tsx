@@ -1,46 +1,32 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Film } from "lucide-react";
 import { popularMoviesService } from "@/services/popular-movies.service";
 import { MovieCard } from "@/components/ui/movie-card";
-import { toast } from "sonner";
 import Link from "next/link";
-import { PopularMovie } from "@/types/role.types";
 import GenericErrorCard from "./generic-error-card";
+import { useQuery } from "@tanstack/react-query";
 
 export function TrendingMovies() {
-  const [movies, setMovies] = useState<PopularMovie[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    data: movies = [],
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["trendingMovies", 4],
+    queryFn: async () => {
+      const response = await popularMoviesService.getPopularMovies(4);
+      if (response.error) throw new Error(response.error);
+      return response.data || [];
+    },
+    staleTime: 1000 * 60 * 10,
+  });
 
-  useEffect(() => {
-    const fetchPopularMovies = async () => {
-      try {
-        const response = await popularMoviesService.getPopularMovies(4);
-        if (response.error) {
-          toast.error("Failed to load trending movies: " + response.error);
-          setError(response.error);
-          return;
-        }
-        setMovies(response.data || []);
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "Failed to load trending movies",
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPopularMovies();
-  }, []);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <section className="py-20 bg-slate-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -79,7 +65,7 @@ export function TrendingMovies() {
           <div className="mx-auto max-w-3xl">
             <GenericErrorCard
               title="Unable to load trending movies"
-              description={error}
+              description={error.message}
               errorName="Network error"
               onAction={() => window.location.reload()}
             />

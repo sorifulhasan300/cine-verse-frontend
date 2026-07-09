@@ -6,6 +6,7 @@ import { Film, Target, Heart, Zap, Eye, Laugh } from "lucide-react";
 import { categoryService } from "@/services/category.service";
 import { Category } from "@/types/category.types";
 import GenericErrorCard from "./generic-error-card";
+import { useQuery } from "@tanstack/react-query";
 
 type CategoryWithMeta = Category & {
   icon: React.ComponentType<{ className?: string }>;
@@ -42,43 +43,32 @@ const descriptionMap: Record<string, string> = {
 };
 
 export function MovieCategories() {
-  const [categories, setCategories] = useState<CategoryWithMeta[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await categoryService.getCategories({ limit: 6 });
-        if (response.error) {
-          throw new Error(response.error);
-        }
-
-        const apiCategories = response.data || [];
-        const categoriesWithMeta: CategoryWithMeta[] = apiCategories
-          .slice(0, 6)
-          .map((category) => ({
-            ...category,
-            icon: iconMap[category.name] || Film,
-            color: colorMap[category.name] || "from-gray-600 to-gray-500",
-            description: descriptionMap[category.name] || "Explore this genre",
-            count: category.movieCount || category.count || 0,
-          }));
-
-        setCategories(categoriesWithMeta);
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "Failed to load categories",
-        );
-      } finally {
-        setLoading(false);
+  const {
+    data: categories = [],
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["movieCategories", 6],
+    queryFn: async () => {
+      const response = await categoryService.getCategories({ limit: 6 });
+      if (response.error) {
+        throw new Error(response.error);
       }
-    };
+      return response.data || [];
+    },
+    select: (apiCategories) => {
+      return apiCategories.slice(0, 6).map((category) => ({
+        ...category,
+        icon: iconMap[category.name] || Film,
+        color: colorMap[category.name] || "from-gray-600 to-gray-500",
+        description: descriptionMap[category.name] || "Explore this genre",
+        count: category.movieCount || category.count || 0,
+      })) as CategoryWithMeta[];
+    },
+    staleTime: 1000 * 60 * 30,
+  });
 
-    fetchCategories();
-  }, []);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <section className="py-20 bg-slate-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -119,7 +109,7 @@ export function MovieCategories() {
           <div className="mx-auto max-w-3xl">
             <GenericErrorCard
               title="Unable to load category"
-              description={error}
+              description={error.message}
               errorName="Network error"
               onAction={() => window.location.reload()}
             />

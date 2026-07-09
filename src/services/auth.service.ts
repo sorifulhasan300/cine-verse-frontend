@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { env } from "@/lib/config";
-const authUrl = env.NEXT_PUBLIC_AUTH_URL;
+const authUrl = "http://localhost:5000/api/v1";
 
 export const authService = {
   verifyEmail: async (otp: string, email: string) => {

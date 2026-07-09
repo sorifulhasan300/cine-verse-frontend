@@ -34,7 +34,9 @@ export function HeroSection() {
         <div className="mb-8">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-600/10 border border-red-600/20 mb-6 backdrop-blur-md">
             <Film className="w-4 h-4 text-red-500 animate-pulse" />
-            <span className="text-sm font-medium text-red-400">Welcome to the Future of Cinema</span>
+            <span className="text-sm font-medium text-red-400">
+              Welcome to the Future of Cinema
+            </span>
           </div>
 
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tight text-white mb-6 select-none">
@@ -46,7 +48,8 @@ export function HeroSection() {
 
           <p className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto mb-8 leading-relaxed drop-shadow">
             Dive into an immersive world of movies, series, and entertainment.
-            Discover, watch, and share your cinematic journey with fellow film enthusiasts.
+            Discover, watch, and share your cinematic journey with fellow film
+            enthusiasts.
           </p>
         </div>
 
@@ -57,7 +60,7 @@ export function HeroSection() {
             className="bg-red-600 hover:bg-red-700 text-white px-8 py-4 text-lg font-semibold shadow-[0_0_25px_rgba(220,38,38,0.4)] hover:shadow-[0_0_35px_rgba(220,38,38,0.6)] transition-all duration-300 w-full sm:w-auto"
             asChild
           >
-            <Link href="/register">
+            <Link href="/register" className="flex items-center">
               <Play className="w-5 h-5 mr-2 fill-white" />
               Start Watching
             </Link>
@@ -66,10 +69,10 @@ export function HeroSection() {
           <Button
             variant="outline"
             size="lg"
-            className="border-slate-700 bg-[#11111c]/40 text-slate-300 hover:bg-slate-800 hover:text-white px-8 py-4 text-lg font-semibold backdrop-blur-sm transition-all duration-200 w-full sm:w-auto"
+            className="border-slate-700  bg-[#11111c]/40 text-slate-300 hover:bg-slate-800 hover:text-white px-8 py-4 text-lg font-semibold backdrop-blur-sm transition-all duration-200 w-full sm:w-auto"
             asChild
           >
-            <Link href="/login">
+            <Link href="/login" className="flex items-center">
               <Star className="w-5 h-5 mr-2" />
               Sign In
             </Link>
@@ -79,16 +82,28 @@ export function HeroSection() {
         {/* Stats or features */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
           <div className="bg-[#11111c]/40 backdrop-blur-md border border-slate-800/60 rounded-xl p-6 shadow-xl transition-transform duration-300 hover:-translate-y-1">
-            <div className="text-3xl font-bold text-red-500 mb-1 drop-shadow-[0_0_10px_rgba(220,38,38,0.3)]">10K+</div>
-            <div className="text-slate-400 text-sm font-medium">Movies & Series</div>
+            <div className="text-3xl font-bold text-red-500 mb-1 drop-shadow-[0_0_10px_rgba(220,38,38,0.3)]">
+              10K+
+            </div>
+            <div className="text-slate-400 text-sm font-medium">
+              Movies & Series
+            </div>
           </div>
           <div className="bg-[#11111c]/40 backdrop-blur-md border border-slate-800/60 rounded-xl p-6 shadow-xl transition-transform duration-300 hover:-translate-y-1">
-            <div className="text-3xl font-bold text-red-500 mb-1 drop-shadow-[0_0_10px_rgba(220,38,38,0.3)]">4K UHD</div>
-            <div className="text-slate-400 text-sm font-medium">Ultra Quality Streaming</div>
+            <div className="text-3xl font-bold text-red-500 mb-1 drop-shadow-[0_0_10px_rgba(220,38,38,0.3)]">
+              4K UHD
+            </div>
+            <div className="text-slate-400 text-sm font-medium">
+              Ultra Quality Streaming
+            </div>
           </div>
           <div className="bg-[#11111c]/40 backdrop-blur-md border border-slate-800/60 rounded-xl p-6 shadow-xl transition-transform duration-300 hover:-translate-y-1">
-            <div className="text-3xl font-bold text-red-500 mb-1 drop-shadow-[0_0_10px_rgba(220,38,38,0.3)]">24/7</div>
-            <div className="text-slate-400 text-sm font-medium">Instant Availability</div>
+            <div className="text-3xl font-bold text-red-500 mb-1 drop-shadow-[0_0_10px_rgba(220,38,38,0.3)]">
+              24/7
+            </div>
+            <div className="text-slate-400 text-sm font-medium">
+              Instant Availability
+            </div>
           </div>
         </div>
       </div>
